@@ -1,0 +1,15 @@
+apiVersion: snowflakewarehouse.crossplane.io/v1alpha1
+kind: Warehouse
+metadata:
+  name: demo-wh
+spec:
+  forProvider:
+    name: DEMO_WH
+    warehouseSize: XSMALL
+    autoSuspend: 60        # se suspende tras 60 segundos sin uso
+    autoResume: "true"     # nota: el CRD define autoResume como string, no boolean
+    initiallySuspended: true
+    comment: "Warehouse de prueba gestionado con Crossplane"
+  providerConfigRef:
+    name: default
+  deletionPolicy: Delete

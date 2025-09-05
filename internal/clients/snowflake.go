@@ -30,7 +30,7 @@ const (
 // TerraformSetupBuilder builds Terraform a terraform.SetupFn function which
 // returns Terraform provider setup configuration
 func TerraformSetupBuilder(version, providerSource, providerVersion string) terraform.SetupFn {
-	return func(ctx context.Context, client client.Client, mg resource.Managed) (terraform.Setup, error) {
+	return func(ctx context.Context, c client.Client, mg resource.Managed) (terraform.Setup, error) {
 		ps := terraform.Setup{
 			Version: version,
 			Requirement: terraform.ProviderRequirement{
@@ -39,21 +39,21 @@ func TerraformSetupBuilder(version, providerSource, providerVersion string) terr
 			},
 		}
 
-		configRef := mg.GetProviderConfigReference()
-		if configRef == nil {
+		ref := mg.GetProviderConfigReference()
+		if ref == nil {
 			return ps, errors.New(errNoProviderConfig)
 		}
 		pc := &v1beta1.ProviderConfig{}
-		if err := client.Get(ctx, types.NamespacedName{Name: configRef.Name}, pc); err != nil {
+		if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, pc); err != nil {
 			return ps, errors.Wrap(err, errGetProviderConfig)
 		}
 
-		t := resource.NewProviderConfigUsageTracker(client, &v1beta1.ProviderConfigUsage{})
-		if err := t.Track(ctx, mg); err != nil {
+		tracker := resource.NewProviderConfigUsageTracker(c, &v1beta1.ProviderConfigUsage{})
+		if err := tracker.Track(ctx, mg); err != nil {
 			return ps, errors.Wrap(err, errTrackUsage)
 		}
 
-		data, err := resource.CommonCredentialExtractor(ctx, pc.Spec.Credentials.Source, client, pc.Spec.Credentials.CommonCredentialSelectors)
+		data, err := resource.CommonCredentialExtractor(ctx, pc.Spec.Credentials.Source, c, pc.Spec.Credentials.CommonCredentialSelectors)
 		if err != nil {
 			return ps, errors.Wrap(err, errExtractCredentials)
 		}
@@ -62,11 +62,30 @@ func TerraformSetupBuilder(version, providerSource, providerVersion string) terr
 			return ps, errors.Wrap(err, errUnmarshalCredentials)
 		}
 
-		// Set credentials in Terraform provider configuration.
-		/*ps.Configuration = map[string]any{
-			"username": creds["username"],
-			"password": creds["password"],
-		}*/
+		cfg := map[string]any{}
+		// obligatorios
+		if v := creds["organization_name"]; v != "" { cfg["organization_name"] = v }
+		if v := creds["account_name"]; v != ""      { cfg["account_name"] = v }
+		if v := creds["user"]; v != ""              { cfg["user"] = v }
+		if v := creds["password"]; v != ""          { cfg["password"] = v }
+
+		// opcionales (si los usas en tu Secret)
+		if v := creds["host"]; v != ""              { cfg["host"] = v }
+		if v := creds["role"]; v != ""              { cfg["role"] = v }
+		if v := creds["authenticator"]; v != ""     { cfg["authenticator"] = v }
+		if v := creds["token"]; v != ""             { cfg["token"] = v }                  // PAT
+		if v := creds["private_key"]; v != ""       { cfg["private_key"] = v }            // JWT
+		if v := creds["private_key_passphrase"]; v != "" { cfg["private_key_passphrase"] = v }
+
+		// autocompletar autenticador si procede
+		if cfg["authenticator"] == nil && cfg["token"] != nil {
+			cfg["authenticator"] = "PROGRAMMATIC_ACCESS_TOKEN"
+		}
+		if cfg["authenticator"] == nil && cfg["private_key"] != nil {
+			cfg["authenticator"] = "SNOWFLAKE_JWT"
+		}
+
+		ps.Configuration = cfg
 		return ps, nil
 	}
 }
