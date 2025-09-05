@@ -1,4 +1,4 @@
-module github.com/upbound/upjet-provider-template
+module github.com/valkiriaaquatica/provider-snowflake
 
 go 1.21
 
