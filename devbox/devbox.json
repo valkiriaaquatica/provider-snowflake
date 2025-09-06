@@ -1,0 +1,7 @@
+{
+  "packages": [
+    "go@1.21.13",
+    "gotools",
+    "git@latest"
+  ]
+}
