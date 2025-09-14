@@ -1,0 +1,63 @@
+apiVersion: snowflaketagassociation.crossplane.io/v1alpha1
+kind: Association
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflaketagassociation/v1alpha1/association
+  labels:
+    testing.upbound.io/example-name: db_association
+  name: db-association
+spec:
+  forProvider:
+    objectIdentifiers:
+    - ${snowflake_database.test.fully_qualified_name}
+    objectType: DATABASE
+    tagId: ${snowflake_tag.test.fully_qualified_name}
+    tagValue: finance
+
+---
+
+apiVersion: snowflakedatabase.crossplane.io/v1alpha1
+kind: Database
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflaketagassociation/v1alpha1/association
+  labels:
+    testing.upbound.io/example-name: test
+  name: test
+spec:
+  forProvider:
+    name: database
+
+---
+
+apiVersion: snowflakeschema.crossplane.io/v1alpha1
+kind: Schema
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflaketagassociation/v1alpha1/association
+  labels:
+    testing.upbound.io/example-name: test
+  name: test
+spec:
+  forProvider:
+    database: database
+    name: schema
+
+---
+
+apiVersion: snowflaketag.crossplane.io/v1alpha1
+kind: Tag
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflaketagassociation/v1alpha1/association
+  labels:
+    testing.upbound.io/example-name: test
+  name: test
+spec:
+  forProvider:
+    allowedValues:
+    - finance
+    - engineering
+    database: database
+    name: cost_center
+    schema: schema

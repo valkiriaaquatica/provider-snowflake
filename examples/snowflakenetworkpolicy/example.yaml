@@ -1,0 +1,9 @@
+apiVersion: snowflakenetworkpolicy.crossplane.io/v1alpha1
+kind: Policy
+metadata:
+  name: basic
+spec:
+  forProvider:
+    name: network_policy_name
+  providerConfigRef:
+    name: default

@@ -1,0 +1,21 @@
+apiVersion: snowflakeapiauthenticationintegrationwithjwtbearer.crossplane.io/v1alpha1
+kind: AuthenticationIntegrationWithJwtBearer
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakeapiauthenticationintegrationwithjwtbearer/v1alpha1/authenticationintegrationwithjwtbearer
+  labels:
+    testing.upbound.io/example-name: test
+  name: test
+spec:
+  forProvider:
+    enabled: true
+    name: test
+    oauthAssertionIssuer: issuer
+    oauthClientIdSecretRef:
+      key: example-key
+      name: example-secret
+      namespace: upbound-system
+    oauthClientSecretSecretRef:
+      key: example-key
+      name: example-secret
+      namespace: upbound-system

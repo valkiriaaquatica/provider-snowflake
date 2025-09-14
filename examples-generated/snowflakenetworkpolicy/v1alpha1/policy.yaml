@@ -1,0 +1,11 @@
+apiVersion: snowflakenetworkpolicy.crossplane.io/v1alpha1
+kind: Policy
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakenetworkpolicy/v1alpha1/policy
+  labels:
+    testing.upbound.io/example-name: basic
+  name: basic
+spec:
+  forProvider:
+    name: network_policy_name

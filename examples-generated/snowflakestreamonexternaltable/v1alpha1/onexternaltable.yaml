@@ -1,0 +1,14 @@
+apiVersion: snowflakestreamonexternaltable.crossplane.io/v1alpha1
+kind: OnExternalTable
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakestreamonexternaltable/v1alpha1/onexternaltable
+  labels:
+    testing.upbound.io/example-name: stream
+  name: stream
+spec:
+  forProvider:
+    database: database
+    externalTable: ${snowflake_external_table.example.fully_qualified_name}
+    name: stream
+    schema: schema

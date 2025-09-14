@@ -1,0 +1,11 @@
+apiVersion: snowflakedatabase.crossplane.io/v1alpha1
+kind: Database
+metadata:
+  name: demo-db
+spec:
+  forProvider:
+    name: DEMO_DB
+    comment: "Base de datos demo creada con Crossplane"
+  providerConfigRef:
+    name: default
+  deletionPolicy: Delete

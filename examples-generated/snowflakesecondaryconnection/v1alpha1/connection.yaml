@@ -1,0 +1,12 @@
+apiVersion: snowflakesecondaryconnection.crossplane.io/v1alpha1
+kind: Connection
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakesecondaryconnection/v1alpha1/connection
+  labels:
+    testing.upbound.io/example-name: basic
+  name: basic
+spec:
+  forProvider:
+    asReplicaOf: '"<organization_name>"."<account_name>"."<connection_name>"'
+    name: connection_name

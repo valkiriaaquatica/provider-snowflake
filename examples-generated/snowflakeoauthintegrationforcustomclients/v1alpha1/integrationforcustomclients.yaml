@@ -1,0 +1,16 @@
+apiVersion: snowflakeoauthintegrationforcustomclients.crossplane.io/v1alpha1
+kind: IntegrationForCustomClients
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakeoauthintegrationforcustomclients/v1alpha1/integrationforcustomclients
+  labels:
+    testing.upbound.io/example-name: basic
+  name: basic
+spec:
+  forProvider:
+    name: integration
+    oauthClientType: CONFIDENTIAL
+    oauthRedirectUriSecretRef:
+      key: example-key
+      name: example-secret
+      namespace: upbound-system

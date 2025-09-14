@@ -1,0 +1,11 @@
+apiVersion: snowflakeaccountrole.crossplane.io/v1alpha1
+kind: Role
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakeaccountrole/v1alpha1/role
+  labels:
+    testing.upbound.io/example-name: minimal
+  name: minimal
+spec:
+  forProvider:
+    name: role_name

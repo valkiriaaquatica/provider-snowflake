@@ -1,0 +1,9 @@
+apiVersion: snowflakeresourcemonitor.crossplane.io/v1alpha1
+kind: Monitor
+metadata:
+  name: minimal
+spec:
+  forProvider:
+    name: resource-monitor-name
+  providerConfigRef:
+    name: default

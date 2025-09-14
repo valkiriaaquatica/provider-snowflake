@@ -1,0 +1,20 @@
+apiVersion: snowflakerowaccesspolicy.crossplane.io/v1alpha1
+kind: AccessPolicy
+metadata:
+  name: example-row-access-policy
+spec:
+  forProvider:
+    argument:
+    - name: ARG1
+      type: VARCHAR
+    - name: ARG2
+      type: NUMBER
+    - name: ARG3
+      type: TIMESTAMP_NTZ
+    body: case when current_role() in ('ANALYST') then true else false end
+    comment: comment
+    database: EXAMPLE_DB
+    name: EXAMPLE_ROW_ACCESS_POLICY
+    schema: EXAMPLE_SCHEMA
+  providerConfigRef:
+    name: default

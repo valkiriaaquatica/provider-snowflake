@@ -1,0 +1,22 @@
+apiVersion: snowflakemaskingpolicy.crossplane.io/v1alpha1
+kind: Policy
+metadata:
+  name: example-masking-policy
+spec:
+  providerConfigRef:
+    name: default
+  forProvider:
+    database: DEMO_DB
+    schema: PUBLIC
+    name: DEMO_MASKING_POLICY
+    returnDataType: VARCHAR
+    argument:
+      - name: ARG1
+        type: VARCHAR
+    body: |
+      case
+        when current_role() in ('ANALYST_ROLE') then
+          ARG1
+        else
+          'MASKED'
+      end

@@ -1,0 +1,13 @@
+apiVersion: snowflakeauthenticationpolicy.crossplane.io/v1alpha1
+kind: Policy
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakeauthenticationpolicy/v1alpha1/policy
+  labels:
+    testing.upbound.io/example-name: basic
+  name: basic
+spec:
+  forProvider:
+    database: database_name
+    name: network_policy_name
+    schema: schema_name

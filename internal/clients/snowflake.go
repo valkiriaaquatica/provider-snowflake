@@ -27,6 +27,19 @@ const (
 	errUnmarshalCredentials = "cannot unmarshal snowflake credentials as JSON"
 )
 
+const (
+	keyOrganizationName     = "organization_name"
+	keyAccountName          = "account_name"
+	keyUser                 = "user"
+	keyPassword             = "password"
+	keyHost                 = "host"
+	keyRole                 = "role"
+	keyAuthenticator        = "authenticator"
+	keyToken                = "token"
+	keyPrivateKey           = "private_key"
+	keyPrivateKeyPassphrase = "private_key_passphrase"
+)
+
 // TerraformSetupBuilder builds Terraform a terraform.SetupFn function which
 // returns Terraform provider setup configuration
 func TerraformSetupBuilder(version, providerSource, providerVersion string) terraform.SetupFn {
@@ -38,54 +51,84 @@ func TerraformSetupBuilder(version, providerSource, providerVersion string) terr
 				Version: providerVersion,
 			},
 		}
-
-		ref := mg.GetProviderConfigReference()
-		if ref == nil {
-			return ps, errors.New(errNoProviderConfig)
+		if err := populateProviderConfig(ctx, c, mg, &ps); err != nil {
+			return ps, err
 		}
-		pc := &v1beta1.ProviderConfig{}
-		if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, pc); err != nil {
-			return ps, errors.Wrap(err, errGetProviderConfig)
-		}
-
-		tracker := resource.NewProviderConfigUsageTracker(c, &v1beta1.ProviderConfigUsage{})
-		if err := tracker.Track(ctx, mg); err != nil {
-			return ps, errors.Wrap(err, errTrackUsage)
-		}
-
-		data, err := resource.CommonCredentialExtractor(ctx, pc.Spec.Credentials.Source, c, pc.Spec.Credentials.CommonCredentialSelectors)
-		if err != nil {
-			return ps, errors.Wrap(err, errExtractCredentials)
-		}
-		creds := map[string]string{}
-		if err := json.Unmarshal(data, &creds); err != nil {
-			return ps, errors.Wrap(err, errUnmarshalCredentials)
-		}
-
-		cfg := map[string]any{}
-		// obligatorios
-		if v := creds["organization_name"]; v != "" { cfg["organization_name"] = v }
-		if v := creds["account_name"]; v != ""      { cfg["account_name"] = v }
-		if v := creds["user"]; v != ""              { cfg["user"] = v }
-		if v := creds["password"]; v != ""          { cfg["password"] = v }
-
-		// opcionales (si los usas en tu Secret)
-		if v := creds["host"]; v != ""              { cfg["host"] = v }
-		if v := creds["role"]; v != ""              { cfg["role"] = v }
-		if v := creds["authenticator"]; v != ""     { cfg["authenticator"] = v }
-		if v := creds["token"]; v != ""             { cfg["token"] = v }                  // PAT
-		if v := creds["private_key"]; v != ""       { cfg["private_key"] = v }            // JWT
-		if v := creds["private_key_passphrase"]; v != "" { cfg["private_key_passphrase"] = v }
-
-		// autocompletar autenticador si procede
-		if cfg["authenticator"] == nil && cfg["token"] != nil {
-			cfg["authenticator"] = "PROGRAMMATIC_ACCESS_TOKEN"
-		}
-		if cfg["authenticator"] == nil && cfg["private_key"] != nil {
-			cfg["authenticator"] = "SNOWFLAKE_JWT"
-		}
-
-		ps.Configuration = cfg
 		return ps, nil
 	}
+}
+
+func populateProviderConfig(ctx context.Context, c client.Client, mg resource.Managed, ps *terraform.Setup) error {
+	ref := mg.GetProviderConfigReference()
+	if ref == nil {
+		return errors.New(errNoProviderConfig)
+	}
+
+	pc := &v1beta1.ProviderConfig{}
+	if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, pc); err != nil {
+		return errors.Wrap(err, errGetProviderConfig)
+	}
+
+	if err := trackProviderUsage(ctx, c, mg); err != nil {
+		return err
+	}
+
+	creds, err := loadCredentials(ctx, c, pc)
+	if err != nil {
+		return err
+	}
+
+	ps.Configuration = buildConfiguration(creds)
+	return nil
+}
+
+func trackProviderUsage(ctx context.Context, c client.Client, mg resource.Managed) error {
+	tracker := resource.NewProviderConfigUsageTracker(c, &v1beta1.ProviderConfigUsage{})
+	return errors.Wrap(tracker.Track(ctx, mg), errTrackUsage)
+}
+
+func loadCredentials(ctx context.Context, c client.Client, pc *v1beta1.ProviderConfig) (map[string]string, error) {
+	data, err := resource.CommonCredentialExtractor(ctx, pc.Spec.Credentials.Source, c, pc.Spec.Credentials.CommonCredentialSelectors)
+	if err != nil {
+		return nil, errors.Wrap(err, errExtractCredentials)
+	}
+	creds := map[string]string{}
+	if err := json.Unmarshal(data, &creds); err != nil {
+		return nil, errors.Wrap(err, errUnmarshalCredentials)
+	}
+	return creds, nil
+}
+
+func buildConfiguration(creds map[string]string) map[string]any {
+	cfg := map[string]any{}
+
+	add := func(k string) {
+		if v := creds[k]; v != "" {
+			cfg[k] = v
+		}
+	}
+
+	for _, k := range []string{
+		keyOrganizationName, keyAccountName, keyUser, keyPassword,
+	} {
+		add(k)
+	}
+
+	for _, k := range []string{
+		keyHost, keyRole, keyAuthenticator, keyToken,
+		keyPrivateKey, keyPrivateKeyPassphrase,
+	} {
+		add(k)
+	}
+
+	if _, ok := cfg[keyAuthenticator]; !ok {
+		if _, ok := cfg[keyToken]; ok {
+			cfg[keyAuthenticator] = "PROGRAMMATIC_ACCESS_TOKEN"
+		}
+		if _, ok := cfg[keyPrivateKey]; ok {
+			cfg[keyAuthenticator] = "SNOWFLAKE_JWT"
+		}
+	}
+
+	return cfg
 }

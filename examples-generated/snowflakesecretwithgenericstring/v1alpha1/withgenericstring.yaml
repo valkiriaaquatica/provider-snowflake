@@ -1,0 +1,17 @@
+apiVersion: snowflakesecretwithgenericstring.crossplane.io/v1alpha1
+kind: WithGenericString
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakesecretwithgenericstring/v1alpha1/withgenericstring
+  labels:
+    testing.upbound.io/example-name: test
+  name: test
+spec:
+  forProvider:
+    database: EXAMPLE_DB
+    name: EXAMPLE_SECRET
+    schema: EXAMPLE_SCHEMA
+    secretStringSecretRef:
+      key: example-key
+      name: example-secret
+      namespace: upbound-system

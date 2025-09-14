@@ -1,0 +1,23 @@
+---
+apiVersion: snowflakedatabase.crossplane.io/v1alpha1
+kind: Database
+metadata:
+  name: demo-database
+spec:
+  providerConfigRef:
+    name: default
+  forProvider:
+    name: DEMO_DB
+    comment: "Database for demo purposes"
+---
+apiVersion: snowflakedatabaserole.crossplane.io/v1alpha1
+kind: Role
+metadata:
+  name: demo-database-role
+spec:
+  providerConfigRef:
+    name: default
+  forProvider:
+    database: DEMO_DB
+    name: DEMO_ROLE
+    comment: "Role associated with DEMO_DB"
