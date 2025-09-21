@@ -1,0 +1,18 @@
+apiVersion: snowflakesaml2integration.crossplane.io/v1alpha1
+kind: Integration
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakesaml2integration/v1alpha1/integration
+  labels:
+    testing.upbound.io/example-name: saml_integration
+  name: saml-integration
+spec:
+  forProvider:
+    name: saml_integration
+    saml2Issuer: test_issuer
+    saml2Provider: CUSTOM
+    saml2SsoUrl: https://example.com
+    saml2X509CertSecretRef:
+      key: attribute.cert.pem
+      name: example-secret
+      namespace: upbound-system

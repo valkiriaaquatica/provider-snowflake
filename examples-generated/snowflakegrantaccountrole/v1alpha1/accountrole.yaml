@@ -1,0 +1,54 @@
+apiVersion: snowflakegrantaccountrole.crossplane.io/v1alpha1
+kind: AccountRole
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakegrantaccountrole/v1alpha1/accountrole
+  labels:
+    testing.upbound.io/example-name: g
+  name: g
+spec:
+  forProvider:
+    parentRoleName: role_name
+    roleName: role_name
+
+---
+
+apiVersion: snowflakeaccountrole.crossplane.io/v1alpha1
+kind: Role
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakegrantaccountrole/v1alpha1/accountrole
+  labels:
+    testing.upbound.io/example-name: parent_role
+  name: parent-role
+spec:
+  forProvider:
+    name: PARENT_ROLE
+
+---
+
+apiVersion: snowflakeaccountrole.crossplane.io/v1alpha1
+kind: Role
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakegrantaccountrole/v1alpha1/accountrole
+  labels:
+    testing.upbound.io/example-name: role
+  name: role
+spec:
+  forProvider:
+    name: ROLE
+
+---
+
+apiVersion: snowflakeuser.crossplane.io/v1alpha1
+kind: User
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakegrantaccountrole/v1alpha1/accountrole
+  labels:
+    testing.upbound.io/example-name: user
+  name: user
+spec:
+  forProvider:
+    name: USER

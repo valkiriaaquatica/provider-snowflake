@@ -3,4 +3,4 @@ kind: Provider
 metadata:
   name: provider-snowflake
 spec:
-  package: xpkg.crossplane.io/valkiriaaquatica/provider-snowflake:v0.1.0
+  package: xpkg.upbound.io/valkiriaaquaticamendi/provider-snowflake:v0.1.0

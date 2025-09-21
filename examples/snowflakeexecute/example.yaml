@@ -1,0 +1,11 @@
+apiVersion: snowflakeexecute.crossplane.io/v1alpha1
+kind: Execute
+metadata:
+  name: demo-execute
+spec:
+  providerConfigRef:
+    name: default
+  forProvider:
+    execute: "CREATE DATABASE DEMO_XPLANE"
+    revert: "DROP DATABASE DEMO_XPLANE"
+    query: "SHOW DATABASES LIKE 'DEMO_XPLANE'"

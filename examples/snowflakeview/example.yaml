@@ -1,0 +1,11 @@
+apiVersion: snowflakeview.crossplane.io/v1alpha1
+kind: View
+metadata:
+  name: view
+spec:
+  forProvider:
+    database: database
+    name: view
+    schema: schema
+    statement: |
+      select * from foo;

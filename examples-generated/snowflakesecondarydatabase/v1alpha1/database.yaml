@@ -1,0 +1,80 @@
+apiVersion: snowflakesecondarydatabase.crossplane.io/v1alpha1
+kind: Database
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakesecondarydatabase/v1alpha1/database
+  labels:
+    testing.upbound.io/example-name: test
+  name: test
+spec:
+  forProvider:
+    asReplicaOf: database_name
+    name: database_name
+    provider: ${secondary_account}
+
+---
+
+apiVersion: snowflakedatabase.crossplane.io/v1alpha1
+kind: Database
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakesecondarydatabase/v1alpha1/database
+  labels:
+    testing.upbound.io/example-name: primary
+  name: primary
+spec:
+  forProvider:
+    name: database_name
+    provider: ${primary_account}
+    replication:
+    - enableToAccount:
+      - accountIdentifier: <secondary_account_organization_name>.<secondary_account_name>
+        withFailover: true
+      ignoreEditionCheck: true
+
+---
+
+apiVersion: snowflakedatabase.crossplane.io/v1alpha1
+kind: Database
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakesecondarydatabase/v1alpha1/database
+  labels:
+    testing.upbound.io/example-name: tasks
+  name: tasks
+spec:
+  forProvider:
+    name: database_for_tasks
+
+---
+
+apiVersion: snowflakeschema.crossplane.io/v1alpha1
+kind: Schema
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakesecondarydatabase/v1alpha1/database
+  labels:
+    testing.upbound.io/example-name: tasks
+  name: tasks
+spec:
+  forProvider:
+    database: database_for_tasks
+    name: schema_for_tasks
+
+---
+
+apiVersion: snowflaketask.crossplane.io/v1alpha1
+kind: Task
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakesecondarydatabase/v1alpha1/database
+  labels:
+    testing.upbound.io/example-name: refresh_secondary_database
+  name: refresh-secondary-database
+spec:
+  forProvider:
+    database: database_for_tasks
+    name: refresh_secondary_database
+    schedule: 10 minute
+    schema: schema_for_tasks
+    sqlStatement: database_name

@@ -1,0 +1,58 @@
+apiVersion: snowflakegrantprivilegestoaccountrole.crossplane.io/v1alpha1
+kind: PrivilegesToAccountRole
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakegrantprivilegestoaccountrole/v1alpha1/privilegestoaccountrole
+  labels:
+    testing.upbound.io/example-name: example
+  name: example
+spec:
+  forProvider:
+    accountRoleName: role_name
+    onAccount: true
+    privileges:
+    - CREATE DATABASE
+    - CREATE USER
+
+---
+
+apiVersion: snowflakeaccountrole.crossplane.io/v1alpha1
+kind: Role
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakegrantprivilegestoaccountrole/v1alpha1/privilegestoaccountrole
+  labels:
+    testing.upbound.io/example-name: db_role
+  name: db-role
+spec:
+  forProvider:
+    name: role_name
+
+---
+
+apiVersion: snowflakedatabase.crossplane.io/v1alpha1
+kind: Database
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakegrantprivilegestoaccountrole/v1alpha1/privilegestoaccountrole
+  labels:
+    testing.upbound.io/example-name: db
+  name: db
+spec:
+  forProvider:
+    name: database
+
+---
+
+apiVersion: snowflakeschema.crossplane.io/v1alpha1
+kind: Schema
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakegrantprivilegestoaccountrole/v1alpha1/privilegestoaccountrole
+  labels:
+    testing.upbound.io/example-name: my_schema
+  name: my-schema
+spec:
+  forProvider:
+    database: database
+    name: my_schema

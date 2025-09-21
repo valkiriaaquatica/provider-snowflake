@@ -1,0 +1,107 @@
+# this PR commits on the same PR opened by renovate bot with the update manifests, code and example
+# this way we can auto generate new releass of the crossplane provider authomatically when a new terraform release is launched
+name: Generate after Renovate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+
+concurrency:
+  group: generate-after-renovate-${{ github.event.pull_request.head.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate-after-renovate:
+    if: |
+      startsWith(github.head_ref, 'renovate/') &&
+      github.actor == 'renovate[bot]' &&
+      (
+        contains(github.event.pull_request.labels.*.name, 'snowflake') ||
+        contains(github.event.pull_request.labels.*.name, 'provider')
+      ) &&
+      github.event.pull_request.head.repo.fork == false
+    runs-on: ubuntu-latest
+
+    env:
+      GIT_AUTHOR_NAME: "renovate-ci[bot]"
+      GIT_AUTHOR_EMAIL: "renovate-ci@users.noreply.github.com"
+      GIT_COMMITTER_NAME: "renovate-ci[bot]"
+      GIT_COMMITTER_EMAIL: "renovate-ci@users.noreply.github.com"
+
+    steps:
+      - name: Checkout Renovate PR branch
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GH_RENOVATE_WRITER_TOKEN }}
+          submodules: true
+
+      - name: Debug the version in the Makefile
+        run: |
+          cat Makefile
+
+      - name: Set up Go 1.21
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5
+        with:
+          go-version: "1.21"
+
+      - name: Install necessary tooling for the CI
+        run: |
+          go install golang.org/x/tools/cmd/goimports@latest
+
+      - name: Run make generate
+        run: |
+          make generate
+
+      - name: Check if changes were generated
+        id: check_diff
+        run: |
+          if git diff --quiet; then
+            echo "no_changes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "no_changes=false" >> "$GITHUB_OUTPUT"
+          fi
+          git status --porcelain
+
+      - name: Decides if the the commit type message (feat/fix) for release-please
+        id: commit_type
+        run: |
+          TITLE="${{ github.event.pull_request.title }}"
+
+          CURRENT=$(echo "$TITLE" | sed -E 's/.*\((v?[0-9]+\.[0-9]+\.[0-9]+) →.*/\1/')
+          NEW=$(echo "$TITLE" | sed -E 's/.*→ (v?[0-9]+\.[0-9]+\.[0-9]+)\).*/\1/')
+          echo "Current=$CURRENT, New=$NEW"
+          CURRENT="${CURRENT#v}"
+          NEW="${NEW#v}"
+
+          CUR_MAJOR=$(echo $CURRENT | cut -d. -f1)
+          CUR_MINOR=$(echo $CURRENT | cut -d. -f2)
+          CUR_PATCH=$(echo $CURRENT | cut -d. -f3)
+
+          NEW_MAJOR=$(echo $NEW | cut -d. -f1)
+          NEW_MINOR=$(echo $NEW | cut -d. -f2)
+          NEW_PATCH=$(echo $NEW | cut -d. -f3)
+
+          TYPE="fix"
+          if [ "$NEW_MAJOR" -gt "$CUR_MAJOR" ]; then
+            TYPE="feat"
+          elif [ "$NEW_MINOR" -gt "$CUR_MINOR" ]; then
+            TYPE="feat"
+          fi
+
+          echo "commit_type=$TYPE" >> $GITHUB_OUTPUT
+
+
+      - name: Commit changes back to Renovate branch
+        if: steps.check_diff.outputs.no_changes == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GH_RENOVATE_WRITER_TOKEN }}
+        run: |
+          git config user.name  "${GIT_AUTHOR_NAME}"
+          git config user.email "${GIT_AUTHOR_EMAIL}"
+          git add -A
+          git commit -m "${{ steps.commit_type.outputs.commit_type }}(terraform-version): generate new docs, code, examples with new terraform provider version"
+          git remote set-url origin "https://${GH_TOKEN}@github.com/${{ github.repository }}.git"
+          git push origin "${GITHUB_HEAD_REF}"

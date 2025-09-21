@@ -1,0 +1,14 @@
+apiVersion: snowflakestreamontable.crossplane.io/v1alpha1
+kind: OnTable
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakestreamontable/v1alpha1/ontable
+  labels:
+    testing.upbound.io/example-name: stream
+  name: stream
+spec:
+  forProvider:
+    database: database
+    name: stream
+    schema: schema
+    table: ${snowflake_table.example.fully_qualified_name}

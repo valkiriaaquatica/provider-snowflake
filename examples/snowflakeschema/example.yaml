@@ -1,0 +1,10 @@
+apiVersion: snowflakeschema.crossplane.io/v1alpha1
+kind: Schema
+metadata:
+  name: schema
+spec:
+  forProvider:
+    database: database_name
+    name: schema_name
+  providerConfigRef:
+    name: default

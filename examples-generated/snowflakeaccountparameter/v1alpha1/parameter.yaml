@@ -1,0 +1,12 @@
+apiVersion: snowflakeaccountparameter.crossplane.io/v1alpha1
+kind: Parameter
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakeaccountparameter/v1alpha1/parameter
+  labels:
+    testing.upbound.io/example-name: p
+  name: p
+spec:
+  forProvider:
+    key: ALLOW_ID_TOKEN
+    value: "true"

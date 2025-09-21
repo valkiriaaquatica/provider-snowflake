@@ -1,0 +1,13 @@
+apiVersion: snowflakescimintegration.crossplane.io/v1alpha1
+kind: Integration
+metadata:
+  name: test
+spec:
+  forProvider:
+    enabled: true
+    name: test
+    runAsRole: GENERIC_SCIM_PROVISIONER
+    scimClient: GENERIC
+    syncPassword: true
+  providerConfigRef:
+    name: default

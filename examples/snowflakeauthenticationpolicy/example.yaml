@@ -1,0 +1,12 @@
+apiVersion: snowflakeauthenticationpolicy.crossplane.io/v1alpha1
+kind: Policy
+metadata:
+  name: basic-policy
+spec:
+  forProvider:
+    database: database_name
+    name: network_policy_name
+    schema: schema_name
+  providerConfigRef:
+    name: default
+  deletionPolicy: Delete

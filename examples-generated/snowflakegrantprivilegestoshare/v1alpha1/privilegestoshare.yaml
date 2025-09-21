@@ -1,0 +1,28 @@
+apiVersion: snowflakegrantprivilegestoshare.crossplane.io/v1alpha1
+kind: PrivilegesToShare
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakegrantprivilegestoshare/v1alpha1/privilegestoshare
+  labels:
+    testing.upbound.io/example-name: example
+  name: example
+spec:
+  forProvider:
+    onDatabase: database_name
+    privileges:
+    - USAGE
+    toShare: ${snowflake_share.example.name}
+
+---
+
+apiVersion: snowflakedatabase.crossplane.io/v1alpha1
+kind: Database
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakegrantprivilegestoshare/v1alpha1/privilegestoshare
+  labels:
+    testing.upbound.io/example-name: example
+  name: example
+spec:
+  forProvider:
+    name: test

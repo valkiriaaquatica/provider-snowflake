@@ -1,0 +1,16 @@
+apiVersion: snowflakeoauthintegrationforpartnerapplications.crossplane.io/v1alpha1
+kind: IntegrationForPartnerApplications
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakeoauthintegrationforpartnerapplications/v1alpha1/integrationforpartnerapplications
+  labels:
+    testing.upbound.io/example-name: test
+  name: test
+spec:
+  forProvider:
+    name: example
+    oauthClient: LOOKER
+    oauthRedirectUriSecretRef:
+      key: example-key
+      name: example-secret
+      namespace: upbound-system

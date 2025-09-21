@@ -1,0 +1,59 @@
+apiVersion: snowflakegrantprivilegestodatabaserole.crossplane.io/v1alpha1
+kind: PrivilegesToDatabaseRole
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakegrantprivilegestodatabaserole/v1alpha1/privilegestodatabaserole
+  labels:
+    testing.upbound.io/example-name: example
+  name: example
+spec:
+  forProvider:
+    databaseRoleName: ${snowflake_database_role.db_role.fully_qualified_name}
+    onDatabase: ${snowflake_database.test_database.fully_qualified_name}
+    privileges:
+    - CREATE
+    - MONITOR
+
+---
+
+apiVersion: snowflakedatabase.crossplane.io/v1alpha1
+kind: Database
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakegrantprivilegestodatabaserole/v1alpha1/privilegestodatabaserole
+  labels:
+    testing.upbound.io/example-name: db
+  name: db
+spec:
+  forProvider:
+    name: database
+
+---
+
+apiVersion: snowflakedatabaserole.crossplane.io/v1alpha1
+kind: Role
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakegrantprivilegestodatabaserole/v1alpha1/privilegestodatabaserole
+  labels:
+    testing.upbound.io/example-name: db_role
+  name: db-role
+spec:
+  forProvider:
+    database: database
+    name: db_role_name
+
+---
+
+apiVersion: snowflakeschema.crossplane.io/v1alpha1
+kind: Schema
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakegrantprivilegestodatabaserole/v1alpha1/privilegestodatabaserole
+  labels:
+    testing.upbound.io/example-name: my_schema
+  name: my-schema
+spec:
+  forProvider:
+    database: database
+    name: my_schema

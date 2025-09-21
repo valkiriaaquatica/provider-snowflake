@@ -1,0 +1,7 @@
+apiVersion: snowflakeuser.crossplane.io/v1alpha1
+kind: User
+metadata:
+  name: minimal
+spec:
+  forProvider:
+    name: Snowflake User - minimal

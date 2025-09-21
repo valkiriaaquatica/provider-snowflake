@@ -1,0 +1,46 @@
+apiVersion: snowflakeshareddatabase.crossplane.io/v1alpha1
+kind: Database
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakeshareddatabase/v1alpha1/database
+  labels:
+    testing.upbound.io/example-name: test
+  name: test
+spec:
+  forProvider:
+    fromShare: <primary_account_organization_name>.<primary_account_name>.${snowflake_share.test.name}
+    name: database_name
+    provider: ${secondary_account}
+
+---
+
+apiVersion: snowflakedatabase.crossplane.io/v1alpha1
+kind: Database
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakeshareddatabase/v1alpha1/database
+  labels:
+    testing.upbound.io/example-name: test
+  name: test
+spec:
+  forProvider:
+    name: shared_database
+    provider: ${primary_account}
+
+---
+
+apiVersion: snowflakegrantprivilegestoshare.crossplane.io/v1alpha1
+kind: PrivilegesToShare
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakeshareddatabase/v1alpha1/database
+  labels:
+    testing.upbound.io/example-name: test
+  name: test
+spec:
+  forProvider:
+    onDatabase: shared_database
+    privileges:
+    - USAGE
+    provider: ${primary_account}
+    toShare: share_name

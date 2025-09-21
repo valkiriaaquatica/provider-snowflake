@@ -1,0 +1,13 @@
+apiVersion: snowflaketag.crossplane.io/v1alpha1
+kind: Tag
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflaketag/v1alpha1/tag
+  labels:
+    testing.upbound.io/example-name: tag
+  name: tag
+spec:
+  forProvider:
+    database: database
+    name: tag
+    schema: schema

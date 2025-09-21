@@ -1,0 +1,11 @@
+apiVersion: snowflakeserviceuser.crossplane.io/v1alpha1
+kind: User
+metadata:
+  annotations:
+    meta.upbound.io/example-id: snowflakeserviceuser/v1alpha1/user
+  labels:
+    testing.upbound.io/example-name: minimal
+  name: minimal
+spec:
+  forProvider:
+    name: Snowflake Service User - minimal
