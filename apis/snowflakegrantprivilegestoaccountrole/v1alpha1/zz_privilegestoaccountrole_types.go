@@ -104,7 +104,7 @@ type OnAccountObjectInitParameters struct {
 	ObjectName *string `json:"objectName,omitempty" tf:"object_name,omitempty"`
 
 	// (String) The object type of the account object on which privileges will be granted. Valid values are: USER | RESOURCE MONITOR | WAREHOUSE | COMPUTE POOL | DATABASE | INTEGRATION | FAILOVER GROUP | REPLICATION GROUP | EXTERNAL VOLUME
-	// The object type of the account object on which privileges will be granted. Valid values are: USER | RESOURCE MONITOR | WAREHOUSE | COMPUTE POOL | DATABASE | INTEGRATION | FAILOVER GROUP | REPLICATION GROUP | EXTERNAL VOLUME
+	// The object type of the account object on which privileges will be granted. Valid values are: `USER` | `RESOURCE MONITOR` | `WAREHOUSE` | `COMPUTE POOL` | `DATABASE` | `INTEGRATION` | `FAILOVER GROUP` | `REPLICATION GROUP` | `EXTERNAL VOLUME`
 	ObjectType *string `json:"objectType,omitempty" tf:"object_type,omitempty"`
 }
 
@@ -115,7 +115,7 @@ type OnAccountObjectObservation struct {
 	ObjectName *string `json:"objectName,omitempty" tf:"object_name,omitempty"`
 
 	// (String) The object type of the account object on which privileges will be granted. Valid values are: USER | RESOURCE MONITOR | WAREHOUSE | COMPUTE POOL | DATABASE | INTEGRATION | FAILOVER GROUP | REPLICATION GROUP | EXTERNAL VOLUME
-	// The object type of the account object on which privileges will be granted. Valid values are: USER | RESOURCE MONITOR | WAREHOUSE | COMPUTE POOL | DATABASE | INTEGRATION | FAILOVER GROUP | REPLICATION GROUP | EXTERNAL VOLUME
+	// The object type of the account object on which privileges will be granted. Valid values are: `USER` | `RESOURCE MONITOR` | `WAREHOUSE` | `COMPUTE POOL` | `DATABASE` | `INTEGRATION` | `FAILOVER GROUP` | `REPLICATION GROUP` | `EXTERNAL VOLUME`
 	ObjectType *string `json:"objectType,omitempty" tf:"object_type,omitempty"`
 }
 
@@ -127,7 +127,7 @@ type OnAccountObjectParameters struct {
 	ObjectName *string `json:"objectName" tf:"object_name,omitempty"`
 
 	// (String) The object type of the account object on which privileges will be granted. Valid values are: USER | RESOURCE MONITOR | WAREHOUSE | COMPUTE POOL | DATABASE | INTEGRATION | FAILOVER GROUP | REPLICATION GROUP | EXTERNAL VOLUME
-	// The object type of the account object on which privileges will be granted. Valid values are: USER | RESOURCE MONITOR | WAREHOUSE | COMPUTE POOL | DATABASE | INTEGRATION | FAILOVER GROUP | REPLICATION GROUP | EXTERNAL VOLUME
+	// The object type of the account object on which privileges will be granted. Valid values are: `USER` | `RESOURCE MONITOR` | `WAREHOUSE` | `COMPUTE POOL` | `DATABASE` | `INTEGRATION` | `FAILOVER GROUP` | `REPLICATION GROUP` | `EXTERNAL VOLUME`
 	// +kubebuilder:validation:Optional
 	ObjectType *string `json:"objectType" tf:"object_type,omitempty"`
 }

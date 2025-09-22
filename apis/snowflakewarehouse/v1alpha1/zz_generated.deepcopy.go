@@ -196,6 +196,11 @@ func (in *ShowOutputObservation) DeepCopyInto(out *ShowOutputObservation) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.Generation != nil {
+		in, out := &in.Generation, &out.Generation
+		*out = new(string)
+		**out = **in
+	}
 	if in.IsCurrent != nil {
 		in, out := &in.IsCurrent, &out.IsCurrent
 		*out = new(bool)
@@ -254,6 +259,11 @@ func (in *ShowOutputObservation) DeepCopyInto(out *ShowOutputObservation) {
 	if in.Quiescing != nil {
 		in, out := &in.Quiescing, &out.Quiescing
 		*out = new(float64)
+		**out = **in
+	}
+	if in.ResourceConstraint != nil {
+		in, out := &in.ResourceConstraint, &out.ResourceConstraint
+		*out = new(string)
 		**out = **in
 	}
 	if in.ResourceMonitor != nil {
@@ -518,6 +528,11 @@ func (in *WarehouseInitParameters) DeepCopyInto(out *WarehouseInitParameters) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.Generation != nil {
+		in, out := &in.Generation, &out.Generation
+		*out = new(string)
+		**out = **in
+	}
 	if in.InitiallySuspended != nil {
 		in, out := &in.InitiallySuspended, &out.InitiallySuspended
 		*out = new(bool)
@@ -546,6 +561,11 @@ func (in *WarehouseInitParameters) DeepCopyInto(out *WarehouseInitParameters) {
 	if in.QueryAccelerationMaxScaleFactor != nil {
 		in, out := &in.QueryAccelerationMaxScaleFactor, &out.QueryAccelerationMaxScaleFactor
 		*out = new(float64)
+		**out = **in
+	}
+	if in.ResourceConstraint != nil {
+		in, out := &in.ResourceConstraint, &out.ResourceConstraint
+		*out = new(string)
 		**out = **in
 	}
 	if in.ResourceMonitor != nil {
@@ -650,6 +670,11 @@ func (in *WarehouseObservation) DeepCopyInto(out *WarehouseObservation) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.Generation != nil {
+		in, out := &in.Generation, &out.Generation
+		*out = new(string)
+		**out = **in
+	}
 	if in.ID != nil {
 		in, out := &in.ID, &out.ID
 		*out = new(string)
@@ -690,6 +715,11 @@ func (in *WarehouseObservation) DeepCopyInto(out *WarehouseObservation) {
 	if in.QueryAccelerationMaxScaleFactor != nil {
 		in, out := &in.QueryAccelerationMaxScaleFactor, &out.QueryAccelerationMaxScaleFactor
 		*out = new(float64)
+		**out = **in
+	}
+	if in.ResourceConstraint != nil {
+		in, out := &in.ResourceConstraint, &out.ResourceConstraint
+		*out = new(string)
 		**out = **in
 	}
 	if in.ResourceMonitor != nil {
@@ -764,6 +794,11 @@ func (in *WarehouseParameters) DeepCopyInto(out *WarehouseParameters) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.Generation != nil {
+		in, out := &in.Generation, &out.Generation
+		*out = new(string)
+		**out = **in
+	}
 	if in.InitiallySuspended != nil {
 		in, out := &in.InitiallySuspended, &out.InitiallySuspended
 		*out = new(bool)
@@ -792,6 +827,11 @@ func (in *WarehouseParameters) DeepCopyInto(out *WarehouseParameters) {
 	if in.QueryAccelerationMaxScaleFactor != nil {
 		in, out := &in.QueryAccelerationMaxScaleFactor, &out.QueryAccelerationMaxScaleFactor
 		*out = new(float64)
+		**out = **in
+	}
+	if in.ResourceConstraint != nil {
+		in, out := &in.ResourceConstraint, &out.ResourceConstraint
+		*out = new(string)
 		**out = **in
 	}
 	if in.ResourceMonitor != nil {
