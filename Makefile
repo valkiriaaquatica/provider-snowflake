@@ -15,7 +15,7 @@ export TERRAFORM_PROVIDER_REPO ?= https://github.com/snowflakedb/terraform-provi
 export TERRAFORM_PROVIDER_VERSION ?= 2.6.0
 export TERRAFORM_PROVIDER_DOWNLOAD_NAME ?= terraform-provider-snowflake
 export TERRAFORM_PROVIDER_DOWNLOAD_URL_PREFIX ?= https://github.com/snowflakedb/$(TERRAFORM_PROVIDER_DOWNLOAD_NAME)/releases/download/v$(TERRAFORM_PROVIDER_VERSION)
-export TERRAFORM_NATIVE_PROVIDER_BINARY ?= terraform-provider-snowflake_v2.6.0_x5
+export TERRAFORM_NATIVE_PROVIDER_BINARY ?= terraform-provider-snowflake_v2.6.0
 export TERRAFORM_DOCS_PATH ?= docs/resources
 
 
