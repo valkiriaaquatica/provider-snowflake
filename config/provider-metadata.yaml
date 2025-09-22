@@ -9501,6 +9501,7 @@ resources:
                   "min_cluster_count": 2,
                   "name": "WAREHOUSE",
                   "query_acceleration_max_scale_factor": 4,
+                  "resource_constraint": "MEMORY_16X",
                   "resource_monitor": "${snowflake_resource_monitor.monitor.fully_qualified_name}",
                   "scaling_policy": "ECONOMY",
                   "statement_queued_timeout_in_seconds": 5,
@@ -9510,6 +9511,14 @@ resources:
                 }
               references:
                 resource_monitor: snowflake_resource_monitor.monitor.fully_qualified_name
+            - name: warehouse
+              manifest: |-
+                {
+                  "generation": "2",
+                  "name": "WAREHOUSE",
+                  "warehouse_size": "MEDIUM",
+                  "warehouse_type": "STANDARD"
+                }
         argumentDocs:
             auto_resume: '(String) (Default: fallback to Snowflake default - uses special value that cannot be set in the configuration manually (default)) Specifies whether to automatically resume a warehouse when a SQL statement (e.g. query) is submitted to it. Available options are: "true" or "false". When the value is not set in the configuration the provider will put "default" there which means to use the Snowflake default for this value.'
             auto_suspend: '(Number) (Default: fallback to Snowflake default - uses special value that cannot be set in the configuration manually (-1)) Specifies the number of seconds of inactivity after which a warehouse is automatically suspended.'
@@ -9522,6 +9531,7 @@ resources:
             description: (String)
             enable_query_acceleration: '(String) (Default: fallback to Snowflake default - uses special value that cannot be set in the configuration manually (default)) Specifies whether to enable the query acceleration service for queries that rely on this warehouse for compute resources. Available options are: "true" or "false". When the value is not set in the configuration the provider will put "default" there which means to use the Snowflake default for this value.'
             fully_qualified_name: (String) Fully qualified name of the resource. For more information, see object name resolution.
+            generation: '(String) Specifies the generation for the warehouse. Only available for standard warehouses. Valid values are (case-insensitive): 1 | 2.'
             id: (String) The ID of this resource.
             initially_suspended: (Boolean) Specifies whether the warehouse is created initially in the ‘Suspended’ state.
             is_current: (Boolean)
@@ -9541,6 +9551,7 @@ resources:
             queued: (Number)
             quiescing: (Number)
             read: (String)
+            resource_constraint: '(String) Specifies the resource constraint for the warehouse. Only available for snowpark-optimized warehouses. For setting generation please use the generation field. Please check Snowflake documentation for required warehouse sizes for each resource constraint. Valid values are (case-insensitive): MEMORY_1X | MEMORY_1X_x86 | MEMORY_16X | MEMORY_16X_x86 | MEMORY_64X | MEMORY_64X_x86.'
             resource_monitor: (String) Specifies the name of a resource monitor that is explicitly assigned to the warehouse. For more information about this resource, see docs.
             resumed_on: (String)
             running: (Number)

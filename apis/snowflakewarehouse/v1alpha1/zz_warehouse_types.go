@@ -78,6 +78,9 @@ type ShowOutputObservation struct {
 	// uses special value that cannot be set in the configuration manually (default)) Specifies whether to enable the query acceleration service for queries that rely on this warehouse for compute resources. Available options are: "true" or "false". When the value is not set in the configuration the provider will put "default" there which means to use the Snowflake default for this value.
 	EnableQueryAcceleration *bool `json:"enableQueryAcceleration,omitempty" tf:"enable_query_acceleration,omitempty"`
 
+	// insensitive): 1 | 2.
+	Generation *string `json:"generation,omitempty" tf:"generation,omitempty"`
+
 	// (Boolean)
 	IsCurrent *bool `json:"isCurrent,omitempty" tf:"is_current,omitempty"`
 
@@ -113,6 +116,9 @@ type ShowOutputObservation struct {
 
 	// (Number)
 	Quiescing *float64 `json:"quiescing,omitempty" tf:"quiescing,omitempty"`
+
+	// optimized warehouses. For setting generation please use the generation field. Please check Snowflake documentation for required warehouse sizes for each resource constraint. Valid values are (case-insensitive): MEMORY_1X | MEMORY_1X_x86 | MEMORY_16X | MEMORY_16X_x86 | MEMORY_64X | MEMORY_64X_x86.
+	ResourceConstraint *string `json:"resourceConstraint,omitempty" tf:"resource_constraint,omitempty"`
 
 	// (String) Specifies the name of a resource monitor that is explicitly assigned to the warehouse. For more information about this resource, see docs.
 	ResourceMonitor *string `json:"resourceMonitor,omitempty" tf:"resource_monitor,omitempty"`
@@ -211,6 +217,10 @@ type WarehouseInitParameters struct {
 	// (Default: fallback to Snowflake default - uses special value that cannot be set in the configuration manually (`default`)) Specifies whether to enable the query acceleration service for queries that rely on this warehouse for compute resources. Available options are: "true" or "false". When the value is not set in the configuration the provider will put "default" there which means to use the Snowflake default for this value.
 	EnableQueryAcceleration *string `json:"enableQueryAcceleration,omitempty" tf:"enable_query_acceleration,omitempty"`
 
+	// insensitive): 1 | 2.
+	// Specifies the generation for the warehouse. Only available for standard warehouses. Valid values are (case-insensitive): `1` | `2`.
+	Generation *string `json:"generation,omitempty" tf:"generation,omitempty"`
+
 	// (Boolean) Specifies whether the warehouse is created initially in the ‘Suspended’ state.
 	// Specifies whether the warehouse is created initially in the ‘Suspended’ state.
 	InitiallySuspended *bool `json:"initiallySuspended,omitempty" tf:"initially_suspended,omitempty"`
@@ -234,6 +244,10 @@ type WarehouseInitParameters struct {
 	// uses special value that cannot be set in the configuration manually (-1)) Specifies the maximum scale factor for leasing compute resources for query acceleration. The scale factor is used as a multiplier based on warehouse size.
 	// (Default: fallback to Snowflake default - uses special value that cannot be set in the configuration manually (`-1`)) Specifies the maximum scale factor for leasing compute resources for query acceleration. The scale factor is used as a multiplier based on warehouse size.
 	QueryAccelerationMaxScaleFactor *float64 `json:"queryAccelerationMaxScaleFactor,omitempty" tf:"query_acceleration_max_scale_factor,omitempty"`
+
+	// optimized warehouses. For setting generation please use the generation field. Please check Snowflake documentation for required warehouse sizes for each resource constraint. Valid values are (case-insensitive): MEMORY_1X | MEMORY_1X_x86 | MEMORY_16X | MEMORY_16X_x86 | MEMORY_64X | MEMORY_64X_x86.
+	// Specifies the resource constraint for the warehouse. Only available for snowpark-optimized warehouses. For setting generation please use the `generation` field. Please check [Snowflake documentation](https://docs.snowflake.com/en/sql-reference/sql/create-warehouse#optional-properties-objectproperties) for required warehouse sizes for each resource constraint. Valid values are (case-insensitive): `MEMORY_1X` | `MEMORY_1X_x86` | `MEMORY_16X` | `MEMORY_16X_x86` | `MEMORY_64X` | `MEMORY_64X_x86`.
+	ResourceConstraint *string `json:"resourceConstraint,omitempty" tf:"resource_constraint,omitempty"`
 
 	// (String) Specifies the name of a resource monitor that is explicitly assigned to the warehouse. For more information about this resource, see docs.
 	// Specifies the name of a resource monitor that is explicitly assigned to the warehouse. For more information about this resource, see [docs](./resource_monitor).
@@ -282,6 +296,10 @@ type WarehouseObservation struct {
 	// Fully qualified name of the resource. For more information, see [object name resolution](https://docs.snowflake.com/en/sql-reference/name-resolution).
 	FullyQualifiedName *string `json:"fullyQualifiedName,omitempty" tf:"fully_qualified_name,omitempty"`
 
+	// insensitive): 1 | 2.
+	// Specifies the generation for the warehouse. Only available for standard warehouses. Valid values are (case-insensitive): `1` | `2`.
+	Generation *string `json:"generation,omitempty" tf:"generation,omitempty"`
+
 	// (String) The ID of this resource.
 	ID *string `json:"id,omitempty" tf:"id,omitempty"`
 
@@ -312,6 +330,10 @@ type WarehouseObservation struct {
 	// uses special value that cannot be set in the configuration manually (-1)) Specifies the maximum scale factor for leasing compute resources for query acceleration. The scale factor is used as a multiplier based on warehouse size.
 	// (Default: fallback to Snowflake default - uses special value that cannot be set in the configuration manually (`-1`)) Specifies the maximum scale factor for leasing compute resources for query acceleration. The scale factor is used as a multiplier based on warehouse size.
 	QueryAccelerationMaxScaleFactor *float64 `json:"queryAccelerationMaxScaleFactor,omitempty" tf:"query_acceleration_max_scale_factor,omitempty"`
+
+	// optimized warehouses. For setting generation please use the generation field. Please check Snowflake documentation for required warehouse sizes for each resource constraint. Valid values are (case-insensitive): MEMORY_1X | MEMORY_1X_x86 | MEMORY_16X | MEMORY_16X_x86 | MEMORY_64X | MEMORY_64X_x86.
+	// Specifies the resource constraint for the warehouse. Only available for snowpark-optimized warehouses. For setting generation please use the `generation` field. Please check [Snowflake documentation](https://docs.snowflake.com/en/sql-reference/sql/create-warehouse#optional-properties-objectproperties) for required warehouse sizes for each resource constraint. Valid values are (case-insensitive): `MEMORY_1X` | `MEMORY_1X_x86` | `MEMORY_16X` | `MEMORY_16X_x86` | `MEMORY_64X` | `MEMORY_64X_x86`.
+	ResourceConstraint *string `json:"resourceConstraint,omitempty" tf:"resource_constraint,omitempty"`
 
 	// (String) Specifies the name of a resource monitor that is explicitly assigned to the warehouse. For more information about this resource, see docs.
 	// Specifies the name of a resource monitor that is explicitly assigned to the warehouse. For more information about this resource, see [docs](./resource_monitor).
@@ -364,6 +386,11 @@ type WarehouseParameters struct {
 	// +kubebuilder:validation:Optional
 	EnableQueryAcceleration *string `json:"enableQueryAcceleration,omitempty" tf:"enable_query_acceleration,omitempty"`
 
+	// insensitive): 1 | 2.
+	// Specifies the generation for the warehouse. Only available for standard warehouses. Valid values are (case-insensitive): `1` | `2`.
+	// +kubebuilder:validation:Optional
+	Generation *string `json:"generation,omitempty" tf:"generation,omitempty"`
+
 	// (Boolean) Specifies whether the warehouse is created initially in the ‘Suspended’ state.
 	// Specifies whether the warehouse is created initially in the ‘Suspended’ state.
 	// +kubebuilder:validation:Optional
@@ -393,6 +420,11 @@ type WarehouseParameters struct {
 	// (Default: fallback to Snowflake default - uses special value that cannot be set in the configuration manually (`-1`)) Specifies the maximum scale factor for leasing compute resources for query acceleration. The scale factor is used as a multiplier based on warehouse size.
 	// +kubebuilder:validation:Optional
 	QueryAccelerationMaxScaleFactor *float64 `json:"queryAccelerationMaxScaleFactor,omitempty" tf:"query_acceleration_max_scale_factor,omitempty"`
+
+	// optimized warehouses. For setting generation please use the generation field. Please check Snowflake documentation for required warehouse sizes for each resource constraint. Valid values are (case-insensitive): MEMORY_1X | MEMORY_1X_x86 | MEMORY_16X | MEMORY_16X_x86 | MEMORY_64X | MEMORY_64X_x86.
+	// Specifies the resource constraint for the warehouse. Only available for snowpark-optimized warehouses. For setting generation please use the `generation` field. Please check [Snowflake documentation](https://docs.snowflake.com/en/sql-reference/sql/create-warehouse#optional-properties-objectproperties) for required warehouse sizes for each resource constraint. Valid values are (case-insensitive): `MEMORY_1X` | `MEMORY_1X_x86` | `MEMORY_16X` | `MEMORY_16X_x86` | `MEMORY_64X` | `MEMORY_64X_x86`.
+	// +kubebuilder:validation:Optional
+	ResourceConstraint *string `json:"resourceConstraint,omitempty" tf:"resource_constraint,omitempty"`
 
 	// (String) Specifies the name of a resource monitor that is explicitly assigned to the warehouse. For more information about this resource, see docs.
 	// Specifies the name of a resource monitor that is explicitly assigned to the warehouse. For more information about this resource, see [docs](./resource_monitor).
