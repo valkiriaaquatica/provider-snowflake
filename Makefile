@@ -12,10 +12,10 @@ TERRAFORM_VERSION_VALID := $(shell [ "$(TERRAFORM_VERSION)" = "`printf "$(TERRAF
 
 export TERRAFORM_PROVIDER_SOURCE ?= snowflakedb/snowflake
 export TERRAFORM_PROVIDER_REPO ?= https://github.com/snowflakedb/terraform-provider-snowflake
-export TERRAFORM_PROVIDER_VERSION ?= 2.7.0
+export TERRAFORM_PROVIDER_VERSION ?= 2.9.0
 export TERRAFORM_PROVIDER_DOWNLOAD_NAME ?= terraform-provider-snowflake
 export TERRAFORM_PROVIDER_DOWNLOAD_URL_PREFIX ?= https://github.com/snowflakedb/$(TERRAFORM_PROVIDER_DOWNLOAD_NAME)/releases/download/v$(TERRAFORM_PROVIDER_VERSION)
-export TERRAFORM_NATIVE_PROVIDER_BINARY ?= terraform-provider-snowflake_v2.7.0
+export TERRAFORM_NATIVE_PROVIDER_BINARY ?= terraform-provider-snowflake_v2.9.0
 export TERRAFORM_DOCS_PATH ?= docs/resources
 
 
