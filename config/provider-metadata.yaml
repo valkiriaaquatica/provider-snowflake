@@ -604,7 +604,7 @@ resources:
             describe_output: (List of Object) Outputs the result of DESCRIBE AUTHENTICATION POLICY for the given policy. (see below for nested schema)
             fully_qualified_name: (String) Fully qualified name of the resource. For more information, see object name resolution.
             id: (String) The ID of this resource.
-            mfa_authentication_methods: (Set of String) A list of authentication methods that enforce multi-factor authentication (MFA) during login. Authentication methods not listed in this parameter do not prompt for multi-factor authentication. Allowed values are ALL | SAML | PASSWORD.
+            mfa_authentication_methods: (Set of String, Deprecated) A list of authentication methods that enforce multi-factor authentication (MFA) during login. Authentication methods not listed in this parameter do not prompt for multi-factor authentication. Allowed values are ALL | SAML | PASSWORD.
             mfa_enrollment: '(String) (Default: OPTIONAL) Determines whether a user must enroll in multi-factor authentication. Allowed values are REQUIRED and OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the CLIENT_TYPES parameter must include SNOWFLAKE_UI, because Snowsight is the only place users can enroll in multi-factor authentication (MFA).'
             name: '(String) Specifies the identifier for the authentication policy. Due to technical limitations (read more here), avoid using the following characters: |, ., ".'
             options: (String)
@@ -3687,7 +3687,7 @@ resources:
             in_schema: (String)
             object_name: (String) The fully qualified name of the object on which privileges will be granted.
             object_type: '(String) The object type of the account object on which privileges will be granted. Valid values are: USER | RESOURCE MONITOR | WAREHOUSE | COMPUTE POOL | DATABASE | INTEGRATION | FAILOVER GROUP | REPLICATION GROUP | EXTERNAL VOLUME'
-            object_type_plural: '(String) The plural object type of the schema object on which privileges will be granted. Valid values are: AGGREGATION POLICIES | ALERTS | AUTHENTICATION POLICIES | CORTEX SEARCH SERVICES | DATA METRIC FUNCTIONS | DYNAMIC TABLES | EVENT TABLES | EXTERNAL TABLES | FILE FORMATS | FUNCTIONS | GIT REPOSITORIES | HYBRID TABLES | IMAGE REPOSITORIES | ICEBERG TABLES | MASKING POLICIES | MATERIALIZED VIEWS | MODELS | NETWORK RULES | NOTEBOOKS | PACKAGES POLICIES | PASSWORD POLICIES | PIPES | PROCEDURES | PROJECTION POLICIES | ROW ACCESS POLICIES | SECRETS | SERVICES | SESSION POLICIES | SEQUENCES | SNAPSHOTS | STAGES | STREAMS | TABLES | TAGS | TASKS | VIEWS | STREAMLITS | DATASETS.'
+            object_type_plural: '(String) The plural object type of the schema object on which privileges will be granted. Valid values are: AGGREGATION POLICIES | ALERTS | AUTHENTICATION POLICIES | CORTEX SEARCH SERVICES | DATA METRIC FUNCTIONS | DATASETS | DBT PROJECTS | DYNAMIC TABLES | EVENT TABLES | EXTERNAL TABLES | FILE FORMATS | FUNCTIONS | GIT REPOSITORIES | HYBRID TABLES | IMAGE REPOSITORIES | ICEBERG TABLES | JOIN POLICIES | MASKING POLICIES | MATERIALIZED VIEWS | MODELS | MODEL MONITORS | NETWORK RULES | NOTEBOOKS | PACKAGES POLICIES | PASSWORD POLICIES | PIPES | PRIVACY POLICIES | PROCEDURES | PROJECTION POLICIES | ROW ACCESS POLICIES | SECRETS | SEMANTIC VIEWS | SERVICES | SESSION POLICIES | SEQUENCES | SNAPSHOTS | SNAPSHOT POLICIES | SNAPSHOT SETS | STAGES | STREAMS | STREAMLITS | TABLES | TAGS | TASKS | VIEWS.'
             on_account: '(Boolean) (Default: false) If true, the privileges will be granted on the account.'
             on_account_object: '(Block List, Max: 1) Specifies the account object on which privileges will be granted (see below for nested schema)'
             on_schema: '(Block List, Max: 1) Specifies the schema on which privileges will be granted. (see below for nested schema)'
@@ -4138,8 +4138,8 @@ resources:
             in_database: (String) The fully qualified name of the database.
             in_schema: (String) The fully qualified name of the schema.
             object_name: (String) The fully qualified name of the object on which privileges will be granted.
-            object_type: '(String) The object type of the schema object on which privileges will be granted. Valid values are: AGGREGATION POLICY | ALERT | AUTHENTICATION POLICY | CORTEX SEARCH SERVICE | DATA METRIC FUNCTION | DYNAMIC TABLE | EVENT TABLE | EXTERNAL TABLE | FILE FORMAT | FUNCTION | GIT REPOSITORY | HYBRID TABLE | IMAGE REPOSITORY | ICEBERG TABLE | MASKING POLICY | MATERIALIZED VIEW | MODEL | NETWORK RULE | NOTEBOOK | PACKAGES POLICY | PASSWORD POLICY | PIPE | PROCEDURE | PROJECTION POLICY | ROW ACCESS POLICY | SECRET | SERVICE | SESSION POLICY | SEQUENCE | SNAPSHOT | STAGE | STREAM | TABLE | TAG | TASK | VIEW | STREAMLIT | DATASET'
-            object_type_plural: '(String) The plural object type of the schema object on which privileges will be granted. Valid values are: AGGREGATION POLICIES | ALERTS | AUTHENTICATION POLICIES | CORTEX SEARCH SERVICES | DATA METRIC FUNCTIONS | DYNAMIC TABLES | EVENT TABLES | EXTERNAL TABLES | FILE FORMATS | FUNCTIONS | GIT REPOSITORIES | HYBRID TABLES | IMAGE REPOSITORIES | ICEBERG TABLES | MASKING POLICIES | MATERIALIZED VIEWS | MODELS | NETWORK RULES | NOTEBOOKS | PACKAGES POLICIES | PASSWORD POLICIES | PIPES | PROCEDURES | PROJECTION POLICIES | ROW ACCESS POLICIES | SECRETS | SERVICES | SESSION POLICIES | SEQUENCES | SNAPSHOTS | STAGES | STREAMS | TABLES | TAGS | TASKS | VIEWS | STREAMLITS | DATASETS.'
+            object_type: '(String) The object type of the schema object on which privileges will be granted. Valid values are: AGGREGATION POLICY | ALERT | AUTHENTICATION POLICY | CORTEX SEARCH SERVICE | DATA METRIC FUNCTION | DATASET | DBT PROJECT | DYNAMIC TABLE | EVENT TABLE | EXTERNAL TABLE | FILE FORMAT | FUNCTION | GIT REPOSITORY | HYBRID TABLE | IMAGE REPOSITORY | ICEBERG TABLE | JOIN POLICY | MASKING POLICY | MATERIALIZED VIEW | MODEL | MODEL MONITOR | NETWORK RULE | NOTEBOOK | PACKAGES POLICY | PASSWORD POLICY | PIPE | PRIVACY POLICY | PROCEDURE | PROJECTION POLICY | ROW ACCESS POLICY | SECRET | SEMANTIC VIEW | SERVICE | SESSION POLICY | SEQUENCE | SNAPSHOT | SNAPSHOT POLICY | SNAPSHOT SET | STAGE | STREAM | STREAMLIT | TABLE | TAG | TASK | VIEW'
+            object_type_plural: '(String) The plural object type of the schema object on which privileges will be granted. Valid values are: AGGREGATION POLICIES | ALERTS | AUTHENTICATION POLICIES | CORTEX SEARCH SERVICES | DATA METRIC FUNCTIONS | DATASETS | DBT PROJECTS | DYNAMIC TABLES | EVENT TABLES | EXTERNAL TABLES | FILE FORMATS | FUNCTIONS | GIT REPOSITORIES | HYBRID TABLES | IMAGE REPOSITORIES | ICEBERG TABLES | JOIN POLICIES | MASKING POLICIES | MATERIALIZED VIEWS | MODELS | MODEL MONITORS | NETWORK RULES | NOTEBOOKS | PACKAGES POLICIES | PASSWORD POLICIES | PIPES | PRIVACY POLICIES | PROCEDURES | PROJECTION POLICIES | ROW ACCESS POLICIES | SECRETS | SEMANTIC VIEWS | SERVICES | SESSION POLICIES | SEQUENCES | SNAPSHOTS | SNAPSHOT POLICIES | SNAPSHOT SETS | STAGES | STREAMS | STREAMLITS | TABLES | TAGS | TASKS | VIEWS.'
             on_database: (String) The fully qualified name of the database on which privileges will be granted. For more information about this resource, see docs.
             on_schema: '(Block List, Max: 1) Specifies the schema on which privileges will be granted. (see below for nested schema)'
             on_schema_object: '(Block List, Max: 1) Specifies the schema object on which privileges will be granted. (see below for nested schema)'
@@ -7557,20 +7557,59 @@ resources:
             - name: integration
               manifest: |-
                 {
-                  "comment": "A storage integration.",
                   "enabled": true,
                   "name": "storage",
-                  "storage_aws_external_id": "ABC12345_DEFRole=2_123ABC459AWQmtAdRqwe/A==",
-                  "storage_aws_iam_user_arn": "...",
-                  "storage_aws_role_arn": "...",
+                  "storage_allowed_locations": [
+                    "s3://mybucket1/path1/",
+                    "s3://mybucket2/path2/"
+                  ],
+                  "storage_aws_role_arn": "arn:aws:iam::001234567890:role/myrole",
                   "storage_provider": "S3",
                   "type": "EXTERNAL_STAGE"
+                }
+            - name: integration
+              manifest: |-
+                {
+                  "comment": "AWS S3 integration with private link",
+                  "enabled": true,
+                  "name": "S3_INTEGRATION",
+                  "storage_allowed_locations": [
+                    "s3://mybucket1/path1/",
+                    "s3://mybucket2/path2/"
+                  ],
+                  "storage_aws_external_id": "ABC12345_DEFRole=2_123ABC459AWQmtAdRqwe/A==",
+                  "storage_aws_object_acl": "bucket-owner-full-control",
+                  "storage_aws_role_arn": "arn:aws:iam::001234567890:role/myrole",
+                  "storage_blocked_locations": [
+                    "s3://mybucket1/path1/blocked/",
+                    "s3://mybucket2/path2/blocked/"
+                  ],
+                  "storage_provider": "S3",
+                  "type": "EXTERNAL_STAGE",
+                  "use_privatelink_endpoint": "true"
+                }
+            - name: azure_integration
+              manifest: |-
+                {
+                  "azure_tenant_id": "a123b4c5-1234-123a-a12b-1a23b45678c9",
+                  "comment": "Azure integration with private link",
+                  "enabled": true,
+                  "name": "AZURE_INTEGRATION",
+                  "storage_allowed_locations": [
+                    "azure://myaccount.blob.core.windows.net/mycontainer/path1/"
+                  ],
+                  "storage_blocked_locations": [
+                    "azure://myaccount.blob.core.windows.net/mycontainer/path1/blocked/"
+                  ],
+                  "storage_provider": "AZURE",
+                  "type": "EXTERNAL_STAGE",
+                  "use_privatelink_endpoint": "true"
                 }
         argumentDocs:
             azure_consent_url: (String, Sensitive) The consent URL that is used to create an Azure Snowflake service principle inside your tenant.
             azure_multi_tenant_app_name: (String) This is the name of the Snowflake client application created for your account.
-            azure_tenant_id: '(String) (Default: ``)'
-            comment: '(String) (Default: ``)'
+            azure_tenant_id: '(String) (Default: ``) Specifies the ID for your Office 365 tenant that the allowed and blocked storage accounts belong to.'
+            comment: '(String) (Default: ``) Specifies a comment for the storage integration.'
             create: (String)
             created_on: (String) Date and time when the storage integration was created.
             default: (String)
@@ -7579,20 +7618,20 @@ resources:
             enabled: '(Boolean) (Default: true)'
             fully_qualified_name: (String) Fully qualified name of the resource. For more information, see object name resolution.
             id: (String) The ID of this resource.
-            name: (String)
+            name: (String) String that specifies the identifier (i.e. name) for the integration; must be unique in your account.
             read: (String)
             storage_allowed_locations: (List of String) Explicitly limits external stages that use the integration to reference one or more storage locations.
-            storage_aws_external_id: (String) The external ID that Snowflake will use when assuming the AWS role.
+            storage_aws_external_id: (String) Optionally specifies an external ID that Snowflake uses to establish a trust relationship with AWS.
             storage_aws_iam_user_arn: (String) The Snowflake user that will attempt to assume the AWS role.
             storage_aws_object_acl: (String) "bucket-owner-full-control" Enables support for AWS access control lists (ACLs) to grant the bucket owner full control.
-            storage_aws_role_arn: '(String) (Default: ``)'
+            storage_aws_role_arn: '(String) (Default: ``) Specifies the Amazon Resource Name (ARN) of the AWS identity and access management (IAM) role that grants privileges on the S3 bucket containing your data files.'
             storage_blocked_locations: (List of String) Explicitly prohibits external stages that use the integration from referencing one or more storage locations.
             storage_gcp_service_account: (String) This is the name of the Snowflake Google Service Account created for your account.
             storage_provider: '(String) Specifies the storage provider for the integration. Valid options are: S3 | S3GOV | S3CHINA | GCS | AZURE'
             timeouts: (Block, Optional) (see below for nested schema)
-            type: '(String) (Default: EXTERNAL_STAGE)'
+            type: '(String) (Default: EXTERNAL_STAGE) Specifies the type of the storage integration.'
             update: (String)
-            use_privatelink_endpoint: (List of Object) (see below for nested schema)
+            use_privatelink_endpoint: '(String) (Default: fallback to Snowflake default - uses special value that cannot be set in the configuration manually (default)) Specifies whether to use outbound private connectivity to harden the security posture. Supported for AWS S3 and Azure storage providers. Available options are: "true" or "false". When the value is not set in the configuration the provider will put "default" there which means to use the Snowflake default for this value.'
             value: (String)
         importStatements:
             - terraform import snowflake_storage_integration.example name
