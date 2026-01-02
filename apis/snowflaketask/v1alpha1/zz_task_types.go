@@ -762,6 +762,12 @@ type ParametersObservation struct {
 	// separated list of identifiers. An identifier can be a fully or partially qualified schema name. For more information, check SEARCH_PATH docs.
 	SearchPath []SearchPathObservation `json:"searchPath,omitempty" tf:"search_path,omitempty"`
 
+	// insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MAX_STATEMENT_SIZE docs.
+	ServerlessTaskMaxStatementSize []ServerlessTaskMaxStatementSizeObservation `json:"serverlessTaskMaxStatementSize,omitempty" tf:"serverless_task_max_statement_size,omitempty"`
+
+	// insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MIN_STATEMENT_SIZE docs.
+	ServerlessTaskMinStatementSize []ServerlessTaskMinStatementSizeObservation `json:"serverlessTaskMinStatementSize,omitempty" tf:"serverless_task_min_statement_size,omitempty"`
+
 	// (Number) Amount of time, in seconds, a SQL statement (query, DDL, DML, etc.) remains queued for a warehouse before it is canceled by the system. This parameter can be used in conjunction with the MAX_CONCURRENCY_LEVEL parameter to ensure a warehouse is never backlogged. For more information, check STATEMENT_QUEUED_TIMEOUT_IN_SECONDS docs.
 	StatementQueuedTimeoutInSeconds []StatementQueuedTimeoutInSecondsObservation `json:"statementQueuedTimeoutInSeconds,omitempty" tf:"statement_queued_timeout_in_seconds,omitempty"`
 
@@ -942,35 +948,61 @@ type S3StageVpceDNSNameParameters struct {
 
 type ScheduleInitParameters struct {
 
-	// (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers only. (conflicts with using_cron)
-	// Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers only. (conflicts with `using_cron`)
+	// (Number) Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, minutes, and using_cron)
+	// Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with `seconds`, `minutes`, and `using_cron`)
+	Hours *float64 `json:"hours,omitempty" tf:"hours,omitempty"`
+
+	// (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, hours, and using_cron)
+	// Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with `seconds`, `hours`, and `using_cron`)
 	Minutes *float64 `json:"minutes,omitempty" tf:"minutes,omitempty"`
 
-	// (String) Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with minutes)
-	// Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with `minutes`)
+	// (Number) Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with minutes, hours, and using_cron)
+	// Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with `minutes`, `hours`, and `using_cron`)
+	Seconds *float64 `json:"seconds,omitempty" tf:"seconds,omitempty"`
+
+	// (String) Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with seconds, minutes, and hours)
+	// Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with `seconds`, `minutes`, and `hours`)
 	UsingCron *string `json:"usingCron,omitempty" tf:"using_cron,omitempty"`
 }
 
 type ScheduleObservation struct {
 
-	// (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers only. (conflicts with using_cron)
-	// Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers only. (conflicts with `using_cron`)
+	// (Number) Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, minutes, and using_cron)
+	// Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with `seconds`, `minutes`, and `using_cron`)
+	Hours *float64 `json:"hours,omitempty" tf:"hours,omitempty"`
+
+	// (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, hours, and using_cron)
+	// Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with `seconds`, `hours`, and `using_cron`)
 	Minutes *float64 `json:"minutes,omitempty" tf:"minutes,omitempty"`
 
-	// (String) Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with minutes)
-	// Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with `minutes`)
+	// (Number) Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with minutes, hours, and using_cron)
+	// Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with `minutes`, `hours`, and `using_cron`)
+	Seconds *float64 `json:"seconds,omitempty" tf:"seconds,omitempty"`
+
+	// (String) Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with seconds, minutes, and hours)
+	// Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with `seconds`, `minutes`, and `hours`)
 	UsingCron *string `json:"usingCron,omitempty" tf:"using_cron,omitempty"`
 }
 
 type ScheduleParameters struct {
 
-	// (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers only. (conflicts with using_cron)
-	// Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers only. (conflicts with `using_cron`)
+	// (Number) Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, minutes, and using_cron)
+	// Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with `seconds`, `minutes`, and `using_cron`)
+	// +kubebuilder:validation:Optional
+	Hours *float64 `json:"hours,omitempty" tf:"hours,omitempty"`
+
+	// (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, hours, and using_cron)
+	// Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with `seconds`, `hours`, and `using_cron`)
 	// +kubebuilder:validation:Optional
 	Minutes *float64 `json:"minutes,omitempty" tf:"minutes,omitempty"`
 
-	// (String) Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with minutes)
-	// Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with `minutes`)
+	// (Number) Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with minutes, hours, and using_cron)
+	// Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with `minutes`, `hours`, and `using_cron`)
+	// +kubebuilder:validation:Optional
+	Seconds *float64 `json:"seconds,omitempty" tf:"seconds,omitempty"`
+
+	// (String) Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with seconds, minutes, and hours)
+	// Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with `seconds`, `minutes`, and `hours`)
 	// +kubebuilder:validation:Optional
 	UsingCron *string `json:"usingCron,omitempty" tf:"using_cron,omitempty"`
 }
@@ -997,6 +1029,54 @@ type SearchPathObservation struct {
 }
 
 type SearchPathParameters struct {
+}
+
+type ServerlessTaskMaxStatementSizeInitParameters struct {
+}
+
+type ServerlessTaskMaxStatementSizeObservation struct {
+
+	// (String)
+	Default *string `json:"default,omitempty" tf:"default,omitempty"`
+
+	// (String)
+	Description *string `json:"description,omitempty" tf:"description,omitempty"`
+
+	// (String)
+	Key *string `json:"key,omitempty" tf:"key,omitempty"`
+
+	// (String)
+	Level *string `json:"level,omitempty" tf:"level,omitempty"`
+
+	// (String)
+	Value *string `json:"value,omitempty" tf:"value,omitempty"`
+}
+
+type ServerlessTaskMaxStatementSizeParameters struct {
+}
+
+type ServerlessTaskMinStatementSizeInitParameters struct {
+}
+
+type ServerlessTaskMinStatementSizeObservation struct {
+
+	// (String)
+	Default *string `json:"default,omitempty" tf:"default,omitempty"`
+
+	// (String)
+	Description *string `json:"description,omitempty" tf:"description,omitempty"`
+
+	// (String)
+	Key *string `json:"key,omitempty" tf:"key,omitempty"`
+
+	// (String)
+	Level *string `json:"level,omitempty" tf:"level,omitempty"`
+
+	// (String)
+	Value *string `json:"value,omitempty" tf:"value,omitempty"`
+}
+
+type ServerlessTaskMinStatementSizeParameters struct {
 }
 
 type ShowOutputInitParameters struct {
@@ -1056,7 +1136,7 @@ type ShowOutputObservation struct {
 	// +listType=set
 	Predecessors []*string `json:"predecessors,omitempty" tf:"predecessors,omitempty"`
 
-	// fields minutes or using_cron should be set) (see below for nested schema)
+	// fields seconds, minutes, hours, or using_cron should be set) For Triggered tasks, a schedule is not required. For other tasks, a schedule must be defined for a standalone task or the root task in a task graph; otherwise, the task only runs if manually executed using EXECUTE TASK in, for example, the snowflake_execute resource. A schedule cannot be specified for child tasks in a task graph. For more information on schedule restrictions, consult the official documentation for Task object. (see below for nested schema)
 	Schedule *string `json:"schedule,omitempty" tf:"schedule,omitempty"`
 
 	// (String)
@@ -1064,6 +1144,9 @@ type ShowOutputObservation struct {
 
 	// (String)
 	State *string `json:"state,omitempty" tf:"state,omitempty"`
+
+	// fields hours, minutes, or seconds should be set) (see below for nested schema)
+	TargetCompletionInterval []TargetCompletionIntervalObservation `json:"targetCompletionInterval,omitempty" tf:"target_completion_interval,omitempty"`
 
 	// (List of Object) (see below for nested schema)
 	TaskRelations []TaskRelationsObservation `json:"taskRelations,omitempty" tf:"task_relations,omitempty"`
@@ -1169,6 +1252,24 @@ type SuspendTaskAfterNumFailuresObservation struct {
 }
 
 type SuspendTaskAfterNumFailuresParameters struct {
+}
+
+type TargetCompletionIntervalInitParameters struct {
+}
+
+type TargetCompletionIntervalObservation struct {
+
+	// (Number) Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, minutes, and using_cron)
+	Hours *float64 `json:"hours,omitempty" tf:"hours,omitempty"`
+
+	// (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, hours, and using_cron)
+	Minutes *float64 `json:"minutes,omitempty" tf:"minutes,omitempty"`
+
+	// (Number) Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with minutes, hours, and using_cron)
+	Seconds *float64 `json:"seconds,omitempty" tf:"seconds,omitempty"`
+}
+
+type TargetCompletionIntervalParameters struct {
 }
 
 type TaskAutoRetryAttemptsInitParameters struct {
@@ -1358,8 +1459,8 @@ type TaskInitParameters struct {
 	// Any single SQL statement, or a call to a stored procedure, executed when the task runs.
 	SQLStatement *string `json:"sqlStatement,omitempty" tf:"sql_statement,omitempty"`
 
-	// fields minutes or using_cron should be set) (see below for nested schema)
-	// The schedule for periodically running the task. This can be a cron or interval in minutes. (Conflicts with finalize and after; when set, one of the sub-fields `minutes` or `using_cron` should be set)
+	// fields seconds, minutes, hours, or using_cron should be set) For Triggered tasks, a schedule is not required. For other tasks, a schedule must be defined for a standalone task or the root task in a task graph; otherwise, the task only runs if manually executed using EXECUTE TASK in, for example, the snowflake_execute resource. A schedule cannot be specified for child tasks in a task graph. For more information on schedule restrictions, consult the official documentation for Task object. (see below for nested schema)
+	// The schedule for periodically running the task. This can be a cron or interval in seconds, minutes, or hours. (Conflicts with finalize and after; when set, one of the sub-fields `seconds`, `minutes`, `hours`, or `using_cron` should be set) For [Triggered tasks](https://docs.snowflake.com/en/user-guide/tasks-triggered), a schedule is not required. For other tasks, a schedule must be defined for a standalone task or the root task in a [task graph](https://docs.snowflake.com/en/user-guide/tasks-graphs#label-task-dag); otherwise, the task only runs if manually executed using [EXECUTE TASK](https://docs.snowflake.com/en/sql-reference/sql/execute-task) in, for example, the [snowflake_execute](https://registry.io/providers/snowflakedb/snowflake/latest/docs/resources/execute) resource. A schedule cannot be specified for child tasks in a task graph. For more information on schedule restrictions, consult the [official documentation for Task object](https://docs.snowflake.com/en/user-guide/tasks-intro).
 	Schedule []ScheduleInitParameters `json:"schedule,omitempty" tf:"schedule,omitempty"`
 
 	// (String) The schema in which to create the task. Due to technical limitations (read more here), avoid using the following characters: |, ., ".
@@ -1369,6 +1470,14 @@ type TaskInitParameters struct {
 	// separated list of identifiers. An identifier can be a fully or partially qualified schema name. For more information, check SEARCH_PATH docs.
 	// Specifies the path to search to resolve unqualified object names in queries. For more information, see [Name resolution in queries](https://docs.snowflake.com/en/sql-reference/name-resolution.html#label-object-name-resolution-search-path). Comma-separated list of identifiers. An identifier can be a fully or partially qualified schema name. For more information, check [SEARCH_PATH docs](https://docs.snowflake.com/en/sql-reference/parameters#search-path).
 	SearchPath *string `json:"searchPath,omitempty" tf:"search_path,omitempty"`
+
+	// insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MAX_STATEMENT_SIZE docs.
+	// Specifies the maximum warehouse size for serverless tasks. Valid values are (case-insensitive): `XSMALL` | `X-SMALL` | `SMALL` | `MEDIUM` | `LARGE` | `XLARGE` | `X-LARGE` | `XXLARGE` | `X2LARGE` | `2X-LARGE` | `XXXLARGE` | `X3LARGE` | `3X-LARGE` | `X4LARGE` | `4X-LARGE` | `X5LARGE` | `5X-LARGE` | `X6LARGE` | `6X-LARGE`. For more information, check [SERVERLESS_TASK_MAX_STATEMENT_SIZE docs](https://docs.snowflake.com/en/sql-reference/parameters#serverless-task-max-statement-size).
+	ServerlessTaskMaxStatementSize *string `json:"serverlessTaskMaxStatementSize,omitempty" tf:"serverless_task_max_statement_size,omitempty"`
+
+	// insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MIN_STATEMENT_SIZE docs.
+	// Specifies the minimum warehouse size for serverless tasks. Valid values are (case-insensitive): `XSMALL` | `X-SMALL` | `SMALL` | `MEDIUM` | `LARGE` | `XLARGE` | `X-LARGE` | `XXLARGE` | `X2LARGE` | `2X-LARGE` | `XXXLARGE` | `X3LARGE` | `3X-LARGE` | `X4LARGE` | `4X-LARGE` | `X5LARGE` | `5X-LARGE` | `X6LARGE` | `6X-LARGE`. For more information, check [SERVERLESS_TASK_MIN_STATEMENT_SIZE docs](https://docs.snowflake.com/en/sql-reference/parameters#serverless-task-min-statement-size).
+	ServerlessTaskMinStatementSize *string `json:"serverlessTaskMinStatementSize,omitempty" tf:"serverless_task_min_statement_size,omitempty"`
 
 	// (Boolean) Specifies if the task should be started or suspended.
 	// Specifies if the task should be started or suspended.
@@ -1389,6 +1498,10 @@ type TaskInitParameters struct {
 	// (Number) Specifies the number of consecutive failed task runs after which the current task is suspended automatically. The default is 0 (no automatic suspension). For more information, check SUSPEND_TASK_AFTER_NUM_FAILURES docs.
 	// Specifies the number of consecutive failed task runs after which the current task is suspended automatically. The default is 0 (no automatic suspension). For more information, check [SUSPEND_TASK_AFTER_NUM_FAILURES docs](https://docs.snowflake.com/en/sql-reference/parameters#suspend-task-after-num-failures).
 	SuspendTaskAfterNumFailures *float64 `json:"suspendTaskAfterNumFailures,omitempty" tf:"suspend_task_after_num_failures,omitempty"`
+
+	// fields hours, minutes, or seconds should be set) (see below for nested schema)
+	// Specifies the target completion interval for tasks. This can be specified in hours, minutes, or seconds. (when set, one of the sub-fields `hours`, `minutes`, or `seconds` should be set)
+	TargetCompletionInterval []TaskTargetCompletionIntervalInitParameters `json:"targetCompletionInterval,omitempty" tf:"target_completion_interval,omitempty"`
 
 	// (Number) Specifies the number of automatic task graph retry attempts. If any task graphs complete in a FAILED state, Snowflake can automatically retry the task graphs from the last task in the graph that failed. For more information, check TASK_AUTO_RETRY_ATTEMPTS docs.
 	// Specifies the number of automatic task graph retry attempts. If any task graphs complete in a FAILED state, Snowflake can automatically retry the task graphs from the last task in the graph that failed. For more information, check [TASK_AUTO_RETRY_ATTEMPTS docs](https://docs.snowflake.com/en/sql-reference/parameters#task-auto-retry-attempts).
@@ -1661,8 +1774,8 @@ type TaskObservation struct {
 	// Any single SQL statement, or a call to a stored procedure, executed when the task runs.
 	SQLStatement *string `json:"sqlStatement,omitempty" tf:"sql_statement,omitempty"`
 
-	// fields minutes or using_cron should be set) (see below for nested schema)
-	// The schedule for periodically running the task. This can be a cron or interval in minutes. (Conflicts with finalize and after; when set, one of the sub-fields `minutes` or `using_cron` should be set)
+	// fields seconds, minutes, hours, or using_cron should be set) For Triggered tasks, a schedule is not required. For other tasks, a schedule must be defined for a standalone task or the root task in a task graph; otherwise, the task only runs if manually executed using EXECUTE TASK in, for example, the snowflake_execute resource. A schedule cannot be specified for child tasks in a task graph. For more information on schedule restrictions, consult the official documentation for Task object. (see below for nested schema)
+	// The schedule for periodically running the task. This can be a cron or interval in seconds, minutes, or hours. (Conflicts with finalize and after; when set, one of the sub-fields `seconds`, `minutes`, `hours`, or `using_cron` should be set) For [Triggered tasks](https://docs.snowflake.com/en/user-guide/tasks-triggered), a schedule is not required. For other tasks, a schedule must be defined for a standalone task or the root task in a [task graph](https://docs.snowflake.com/en/user-guide/tasks-graphs#label-task-dag); otherwise, the task only runs if manually executed using [EXECUTE TASK](https://docs.snowflake.com/en/sql-reference/sql/execute-task) in, for example, the [snowflake_execute](https://registry.io/providers/snowflakedb/snowflake/latest/docs/resources/execute) resource. A schedule cannot be specified for child tasks in a task graph. For more information on schedule restrictions, consult the [official documentation for Task object](https://docs.snowflake.com/en/user-guide/tasks-intro).
 	Schedule []ScheduleObservation `json:"schedule,omitempty" tf:"schedule,omitempty"`
 
 	// (String) The schema in which to create the task. Due to technical limitations (read more here), avoid using the following characters: |, ., ".
@@ -1672,6 +1785,14 @@ type TaskObservation struct {
 	// separated list of identifiers. An identifier can be a fully or partially qualified schema name. For more information, check SEARCH_PATH docs.
 	// Specifies the path to search to resolve unqualified object names in queries. For more information, see [Name resolution in queries](https://docs.snowflake.com/en/sql-reference/name-resolution.html#label-object-name-resolution-search-path). Comma-separated list of identifiers. An identifier can be a fully or partially qualified schema name. For more information, check [SEARCH_PATH docs](https://docs.snowflake.com/en/sql-reference/parameters#search-path).
 	SearchPath *string `json:"searchPath,omitempty" tf:"search_path,omitempty"`
+
+	// insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MAX_STATEMENT_SIZE docs.
+	// Specifies the maximum warehouse size for serverless tasks. Valid values are (case-insensitive): `XSMALL` | `X-SMALL` | `SMALL` | `MEDIUM` | `LARGE` | `XLARGE` | `X-LARGE` | `XXLARGE` | `X2LARGE` | `2X-LARGE` | `XXXLARGE` | `X3LARGE` | `3X-LARGE` | `X4LARGE` | `4X-LARGE` | `X5LARGE` | `5X-LARGE` | `X6LARGE` | `6X-LARGE`. For more information, check [SERVERLESS_TASK_MAX_STATEMENT_SIZE docs](https://docs.snowflake.com/en/sql-reference/parameters#serverless-task-max-statement-size).
+	ServerlessTaskMaxStatementSize *string `json:"serverlessTaskMaxStatementSize,omitempty" tf:"serverless_task_max_statement_size,omitempty"`
+
+	// insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MIN_STATEMENT_SIZE docs.
+	// Specifies the minimum warehouse size for serverless tasks. Valid values are (case-insensitive): `XSMALL` | `X-SMALL` | `SMALL` | `MEDIUM` | `LARGE` | `XLARGE` | `X-LARGE` | `XXLARGE` | `X2LARGE` | `2X-LARGE` | `XXXLARGE` | `X3LARGE` | `3X-LARGE` | `X4LARGE` | `4X-LARGE` | `X5LARGE` | `5X-LARGE` | `X6LARGE` | `6X-LARGE`. For more information, check [SERVERLESS_TASK_MIN_STATEMENT_SIZE docs](https://docs.snowflake.com/en/sql-reference/parameters#serverless-task-min-statement-size).
+	ServerlessTaskMinStatementSize *string `json:"serverlessTaskMinStatementSize,omitempty" tf:"serverless_task_min_statement_size,omitempty"`
 
 	// (List of Object) Outputs the result of SHOW TASKS for the given task. (see below for nested schema)
 	// Outputs the result of `SHOW TASKS` for the given task.
@@ -1696,6 +1817,10 @@ type TaskObservation struct {
 	// (Number) Specifies the number of consecutive failed task runs after which the current task is suspended automatically. The default is 0 (no automatic suspension). For more information, check SUSPEND_TASK_AFTER_NUM_FAILURES docs.
 	// Specifies the number of consecutive failed task runs after which the current task is suspended automatically. The default is 0 (no automatic suspension). For more information, check [SUSPEND_TASK_AFTER_NUM_FAILURES docs](https://docs.snowflake.com/en/sql-reference/parameters#suspend-task-after-num-failures).
 	SuspendTaskAfterNumFailures *float64 `json:"suspendTaskAfterNumFailures,omitempty" tf:"suspend_task_after_num_failures,omitempty"`
+
+	// fields hours, minutes, or seconds should be set) (see below for nested schema)
+	// Specifies the target completion interval for tasks. This can be specified in hours, minutes, or seconds. (when set, one of the sub-fields `hours`, `minutes`, or `seconds` should be set)
+	TargetCompletionInterval []TaskTargetCompletionIntervalObservation `json:"targetCompletionInterval,omitempty" tf:"target_completion_interval,omitempty"`
 
 	// (Number) Specifies the number of automatic task graph retry attempts. If any task graphs complete in a FAILED state, Snowflake can automatically retry the task graphs from the last task in the graph that failed. For more information, check TASK_AUTO_RETRY_ATTEMPTS docs.
 	// Specifies the number of automatic task graph retry attempts. If any task graphs complete in a FAILED state, Snowflake can automatically retry the task graphs from the last task in the graph that failed. For more information, check [TASK_AUTO_RETRY_ATTEMPTS docs](https://docs.snowflake.com/en/sql-reference/parameters#task-auto-retry-attempts).
@@ -1997,8 +2122,8 @@ type TaskParameters struct {
 	// +kubebuilder:validation:Optional
 	SQLStatement *string `json:"sqlStatement,omitempty" tf:"sql_statement,omitempty"`
 
-	// fields minutes or using_cron should be set) (see below for nested schema)
-	// The schedule for periodically running the task. This can be a cron or interval in minutes. (Conflicts with finalize and after; when set, one of the sub-fields `minutes` or `using_cron` should be set)
+	// fields seconds, minutes, hours, or using_cron should be set) For Triggered tasks, a schedule is not required. For other tasks, a schedule must be defined for a standalone task or the root task in a task graph; otherwise, the task only runs if manually executed using EXECUTE TASK in, for example, the snowflake_execute resource. A schedule cannot be specified for child tasks in a task graph. For more information on schedule restrictions, consult the official documentation for Task object. (see below for nested schema)
+	// The schedule for periodically running the task. This can be a cron or interval in seconds, minutes, or hours. (Conflicts with finalize and after; when set, one of the sub-fields `seconds`, `minutes`, `hours`, or `using_cron` should be set) For [Triggered tasks](https://docs.snowflake.com/en/user-guide/tasks-triggered), a schedule is not required. For other tasks, a schedule must be defined for a standalone task or the root task in a [task graph](https://docs.snowflake.com/en/user-guide/tasks-graphs#label-task-dag); otherwise, the task only runs if manually executed using [EXECUTE TASK](https://docs.snowflake.com/en/sql-reference/sql/execute-task) in, for example, the [snowflake_execute](https://registry.io/providers/snowflakedb/snowflake/latest/docs/resources/execute) resource. A schedule cannot be specified for child tasks in a task graph. For more information on schedule restrictions, consult the [official documentation for Task object](https://docs.snowflake.com/en/user-guide/tasks-intro).
 	// +kubebuilder:validation:Optional
 	Schedule []ScheduleParameters `json:"schedule,omitempty" tf:"schedule,omitempty"`
 
@@ -2011,6 +2136,16 @@ type TaskParameters struct {
 	// Specifies the path to search to resolve unqualified object names in queries. For more information, see [Name resolution in queries](https://docs.snowflake.com/en/sql-reference/name-resolution.html#label-object-name-resolution-search-path). Comma-separated list of identifiers. An identifier can be a fully or partially qualified schema name. For more information, check [SEARCH_PATH docs](https://docs.snowflake.com/en/sql-reference/parameters#search-path).
 	// +kubebuilder:validation:Optional
 	SearchPath *string `json:"searchPath,omitempty" tf:"search_path,omitempty"`
+
+	// insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MAX_STATEMENT_SIZE docs.
+	// Specifies the maximum warehouse size for serverless tasks. Valid values are (case-insensitive): `XSMALL` | `X-SMALL` | `SMALL` | `MEDIUM` | `LARGE` | `XLARGE` | `X-LARGE` | `XXLARGE` | `X2LARGE` | `2X-LARGE` | `XXXLARGE` | `X3LARGE` | `3X-LARGE` | `X4LARGE` | `4X-LARGE` | `X5LARGE` | `5X-LARGE` | `X6LARGE` | `6X-LARGE`. For more information, check [SERVERLESS_TASK_MAX_STATEMENT_SIZE docs](https://docs.snowflake.com/en/sql-reference/parameters#serverless-task-max-statement-size).
+	// +kubebuilder:validation:Optional
+	ServerlessTaskMaxStatementSize *string `json:"serverlessTaskMaxStatementSize,omitempty" tf:"serverless_task_max_statement_size,omitempty"`
+
+	// insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MIN_STATEMENT_SIZE docs.
+	// Specifies the minimum warehouse size for serverless tasks. Valid values are (case-insensitive): `XSMALL` | `X-SMALL` | `SMALL` | `MEDIUM` | `LARGE` | `XLARGE` | `X-LARGE` | `XXLARGE` | `X2LARGE` | `2X-LARGE` | `XXXLARGE` | `X3LARGE` | `3X-LARGE` | `X4LARGE` | `4X-LARGE` | `X5LARGE` | `5X-LARGE` | `X6LARGE` | `6X-LARGE`. For more information, check [SERVERLESS_TASK_MIN_STATEMENT_SIZE docs](https://docs.snowflake.com/en/sql-reference/parameters#serverless-task-min-statement-size).
+	// +kubebuilder:validation:Optional
+	ServerlessTaskMinStatementSize *string `json:"serverlessTaskMinStatementSize,omitempty" tf:"serverless_task_min_statement_size,omitempty"`
 
 	// (Boolean) Specifies if the task should be started or suspended.
 	// Specifies if the task should be started or suspended.
@@ -2036,6 +2171,11 @@ type TaskParameters struct {
 	// Specifies the number of consecutive failed task runs after which the current task is suspended automatically. The default is 0 (no automatic suspension). For more information, check [SUSPEND_TASK_AFTER_NUM_FAILURES docs](https://docs.snowflake.com/en/sql-reference/parameters#suspend-task-after-num-failures).
 	// +kubebuilder:validation:Optional
 	SuspendTaskAfterNumFailures *float64 `json:"suspendTaskAfterNumFailures,omitempty" tf:"suspend_task_after_num_failures,omitempty"`
+
+	// fields hours, minutes, or seconds should be set) (see below for nested schema)
+	// Specifies the target completion interval for tasks. This can be specified in hours, minutes, or seconds. (when set, one of the sub-fields `hours`, `minutes`, or `seconds` should be set)
+	// +kubebuilder:validation:Optional
+	TargetCompletionInterval []TaskTargetCompletionIntervalParameters `json:"targetCompletionInterval,omitempty" tf:"target_completion_interval,omitempty"`
 
 	// (Number) Specifies the number of automatic task graph retry attempts. If any task graphs complete in a FAILED state, Snowflake can automatically retry the task graphs from the last task in the graph that failed. For more information, check TASK_AUTO_RETRY_ATTEMPTS docs.
 	// Specifies the number of automatic task graph retry attempts. If any task graphs complete in a FAILED state, Snowflake can automatically retry the task graphs from the last task in the graph that failed. For more information, check [TASK_AUTO_RETRY_ATTEMPTS docs](https://docs.snowflake.com/en/sql-reference/parameters#task-auto-retry-attempts).
@@ -2174,6 +2314,54 @@ type TaskRelationsObservation struct {
 }
 
 type TaskRelationsParameters struct {
+}
+
+type TaskTargetCompletionIntervalInitParameters struct {
+
+	// (Number) Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, minutes, and using_cron)
+	// Specifies the target completion interval in hours. (conflicts with `minutes` and `seconds`)
+	Hours *float64 `json:"hours,omitempty" tf:"hours,omitempty"`
+
+	// (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, hours, and using_cron)
+	// Specifies the target completion interval in minutes. (conflicts with `hours` and `seconds`)
+	Minutes *float64 `json:"minutes,omitempty" tf:"minutes,omitempty"`
+
+	// (Number) Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with minutes, hours, and using_cron)
+	// Specifies the target completion interval in seconds. (conflicts with `hours` and `minutes`)
+	Seconds *float64 `json:"seconds,omitempty" tf:"seconds,omitempty"`
+}
+
+type TaskTargetCompletionIntervalObservation struct {
+
+	// (Number) Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, minutes, and using_cron)
+	// Specifies the target completion interval in hours. (conflicts with `minutes` and `seconds`)
+	Hours *float64 `json:"hours,omitempty" tf:"hours,omitempty"`
+
+	// (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, hours, and using_cron)
+	// Specifies the target completion interval in minutes. (conflicts with `hours` and `seconds`)
+	Minutes *float64 `json:"minutes,omitempty" tf:"minutes,omitempty"`
+
+	// (Number) Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with minutes, hours, and using_cron)
+	// Specifies the target completion interval in seconds. (conflicts with `hours` and `minutes`)
+	Seconds *float64 `json:"seconds,omitempty" tf:"seconds,omitempty"`
+}
+
+type TaskTargetCompletionIntervalParameters struct {
+
+	// (Number) Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, minutes, and using_cron)
+	// Specifies the target completion interval in hours. (conflicts with `minutes` and `seconds`)
+	// +kubebuilder:validation:Optional
+	Hours *float64 `json:"hours,omitempty" tf:"hours,omitempty"`
+
+	// (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, hours, and using_cron)
+	// Specifies the target completion interval in minutes. (conflicts with `hours` and `seconds`)
+	// +kubebuilder:validation:Optional
+	Minutes *float64 `json:"minutes,omitempty" tf:"minutes,omitempty"`
+
+	// (Number) Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with minutes, hours, and using_cron)
+	// Specifies the target completion interval in seconds. (conflicts with `hours` and `minutes`)
+	// +kubebuilder:validation:Optional
+	Seconds *float64 `json:"seconds,omitempty" tf:"seconds,omitempty"`
 }
 
 type TimeInputFormatInitParameters struct {

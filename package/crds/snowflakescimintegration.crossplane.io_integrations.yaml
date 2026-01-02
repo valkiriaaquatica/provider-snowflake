@@ -96,8 +96,8 @@ spec:
                     type: string
                   runAsRole:
                     description: |-
-                      (String) Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. Valid options are: OKTA_PROVISIONER | AAD_PROVISIONER | GENERIC_SCIM_PROVISIONER.
-                      Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. Valid options are: `OKTA_PROVISIONER` | `AAD_PROVISIONER` | `GENERIC_SCIM_PROVISIONER`.
+                      sensitive. The exception is using generic_scim_provisioner, okta_provisioner, or aad_provisioner, which are automatically converted to uppercase for backwards compatibility.
+                      Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. This field is case-sensitive. The exception is using `generic_scim_provisioner`, `okta_provisioner`, or `aad_provisioner`, which are automatically converted to uppercase for backwards compatibility.
                     type: string
                   scimClient:
                     description: |-
@@ -145,8 +145,8 @@ spec:
                     type: string
                   runAsRole:
                     description: |-
-                      (String) Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. Valid options are: OKTA_PROVISIONER | AAD_PROVISIONER | GENERIC_SCIM_PROVISIONER.
-                      Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. Valid options are: `OKTA_PROVISIONER` | `AAD_PROVISIONER` | `GENERIC_SCIM_PROVISIONER`.
+                      sensitive. The exception is using generic_scim_provisioner, okta_provisioner, or aad_provisioner, which are automatically converted to uppercase for backwards compatibility.
+                      Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. This field is case-sensitive. The exception is using `generic_scim_provisioner`, `okta_provisioner`, or `aad_provisioner`, which are automatically converted to uppercase for backwards compatibility.
                     type: string
                   scimClient:
                     description: |-
@@ -429,11 +429,9 @@ spec:
                             type: object
                           type: array
                         runAsRole:
-                          description: '(String) Specify the SCIM role in Snowflake
-                            that owns any users and roles that are imported from the
-                            identity provider into Snowflake using SCIM. Provider
-                            assumes that the specified role is already provided. Valid
-                            options are: OKTA_PROVISIONER | AAD_PROVISIONER | GENERIC_SCIM_PROVISIONER.'
+                          description: sensitive. The exception is using generic_scim_provisioner,
+                            okta_provisioner, or aad_provisioner, which are automatically
+                            converted to uppercase for backwards compatibility.
                           items:
                             properties:
                               default:
@@ -511,8 +509,8 @@ spec:
                     type: string
                   runAsRole:
                     description: |-
-                      (String) Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. Valid options are: OKTA_PROVISIONER | AAD_PROVISIONER | GENERIC_SCIM_PROVISIONER.
-                      Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. Valid options are: `OKTA_PROVISIONER` | `AAD_PROVISIONER` | `GENERIC_SCIM_PROVISIONER`.
+                      sensitive. The exception is using generic_scim_provisioner, okta_provisioner, or aad_provisioner, which are automatically converted to uppercase for backwards compatibility.
+                      Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. This field is case-sensitive. The exception is using `generic_scim_provisioner`, `okta_provisioner`, or `aad_provisioner`, which are automatically converted to uppercase for backwards compatibility.
                     type: string
                   scimClient:
                     description: |-

@@ -581,46 +581,87 @@ resources:
                   ],
                   "comment": "My authentication policy.",
                   "database": "database_name",
-                  "mfa_authentication_methods": [
-                    "SAML",
-                    "PASSWORD"
-                  ],
                   "mfa_enrollment": "OPTIONAL",
+                  "mfa_policy": [
+                    {
+                      "allowed_methods": [
+                        "PASSKEY",
+                        "DUO"
+                      ],
+                      "enforce_mfa_on_external_authentication": "ALL"
+                    }
+                  ],
                   "name": "network_policy_name",
+                  "pat_policy": [
+                    {
+                      "default_expiry_in_days": 1,
+                      "max_expiry_in_days": 30,
+                      "network_policy_evaluation": "NOT_ENFORCED"
+                    }
+                  ],
                   "schema": "schema_name",
                   "security_integrations": [
                     "ALL"
+                  ],
+                  "workload_identity_policy": [
+                    {
+                      "allowed_aws_accounts": [
+                        "111122223333"
+                      ],
+                      "allowed_azure_issuers": [
+                        "https://login.microsoftonline.com/tenantid/v2.0"
+                      ],
+                      "allowed_oidc_issuers": [
+                        "https://example.com"
+                      ],
+                      "allowed_providers": [
+                        "ALL"
+                      ]
+                    }
                   ]
                 }
         argumentDocs:
-            authentication_methods: '(Set of String) A list of authentication methods that are allowed during login. This parameter accepts one or more of the following values: ALL | SAML | PASSWORD | OAUTH | KEYPAIR'
-            client_types: (Set of String) A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid CLIENT_TYPES, then the login attempt fails. Allowed values are ALL | SNOWFLAKE_UI | DRIVERS | SNOWSQL. The CLIENT_TYPES property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
+            allowed_aws_accounts: (Set of String) Specifies the list of AWS account IDs allowed by the authentication policy during workload identity authentication of type AWS.
+            allowed_azure_issuers: (Set of String) Specifies the list of Azure Entra ID issuers allowed by the authentication policy during workload identity authentication of type AZURE.
+            allowed_methods: '(Set of String) Specifies the allowed methods for the MFA policy. Valid values are: ALL | PASSKEY | TOTP | DUO. These values are case-sensitive due to Terraform limitations (it''s a nested field). Prefer using uppercased values.'
+            allowed_oidc_issuers: (Set of String) Specifies the list of OIDC issuers allowed by the authentication policy during workload identity authentication of type OIDC.
+            allowed_providers: '(Set of String) Specifies the allowed providers for the workload identity policy. Valid values are: ALL | AWS | AZURE | GCP | OIDC. These values are case-sensitive due to Terraform limitations (it''s a nested field). Prefer using uppercased values.'
+            authentication_methods: '(Set of String) A list of authentication methods that are allowed during login. Valid values are (case-insensitive): ALL | SAML | PASSWORD | OAUTH | KEYPAIR | PROGRAMMATIC_ACCESS_TOKEN | WORKLOAD_IDENTITY.'
+            client_types: '(Set of String) A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid client_types, then the login attempt fails. Valid values are (case-insensitive): ALL | SNOWFLAKE_UI | DRIVERS | SNOWSQL | SNOWFLAKE_CLI. The client_types property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.'
             comment: (String) Specifies a comment for the authentication policy.
             create: (String)
             created_on: (String)
             database: '(String) The database in which to create the authentication policy. Due to technical limitations (read more here), avoid using the following characters: |, ., ".'
             database_name: (String)
+            default_expiry_in_days: (Number) Specifies the default expiration time (in days) for a programmatic access token.
             delete: (String)
             describe_output: (List of Object) Outputs the result of DESCRIBE AUTHENTICATION POLICY for the given policy. (see below for nested schema)
+            enforce_mfa_on_external_authentication: '(String) Determines whether multi-factor authentication (MFA) is enforced on external authentication. Valid values are (case-insensitive): ALL | NONE.'
             fully_qualified_name: (String) Fully qualified name of the resource. For more information, see object name resolution.
             id: (String) The ID of this resource.
+            kind: (String)
+            max_expiry_in_days: (Number) Specifies the maximum number of days that can be set for the expiration time for a programmatic access token.
             mfa_authentication_methods: (Set of String, Deprecated) A list of authentication methods that enforce multi-factor authentication (MFA) during login. Authentication methods not listed in this parameter do not prompt for multi-factor authentication. Allowed values are ALL | SAML | PASSWORD.
-            mfa_enrollment: '(String) (Default: OPTIONAL) Determines whether a user must enroll in multi-factor authentication. Allowed values are REQUIRED and OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the CLIENT_TYPES parameter must include SNOWFLAKE_UI, because Snowsight is the only place users can enroll in multi-factor authentication (MFA).'
+            mfa_enrollment: '(String) Determines whether a user must enroll in multi-factor authentication. Valid values are (case-insensitive): REQUIRED | REQUIRED_PASSWORD_ONLY | OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the client_types parameter must include snowflake_ui, because Snowsight is the only place users can enroll in multi-factor authentication (MFA). Note that when you set this value to OPTIONAL, and your account setup forces users to enroll in MFA, then Snowflake may set quietly this value to REQUIRED_PASSWORD_ONLY, which may cause permadiff. In this case, you may want to adjust this field value.'
+            mfa_policy: '(Block List, Max: 1) Specifies the multi-factor authentication (MFA) methods that users can use as a second factor of authentication. (see below for nested schema)'
             name: '(String) Specifies the identifier for the authentication policy. Due to technical limitations (read more here), avoid using the following characters: |, ., ".'
+            network_policy_evaluation: (String) Specifies the network policy evaluation for the PAT.
             options: (String)
             owner: (String)
             owner_role_type: (String)
+            pat_policy: '(Block List, Max: 1) Specifies the policy for programmatic access tokens. (see below for nested schema)'
             read: (String)
             schema: '(String) The schema in which to create the authentication policy. Due to technical limitations (read more here), avoid using the following characters: |, ., ".'
             schema_name: (String)
-            security_integrations: (Set of String) A list of security integrations the authentication policy is associated with. This parameter has no effect when SAML or OAUTH are not in the AUTHENTICATION_METHODS list. All values in the SECURITY_INTEGRATIONS list must be compatible with the values in the AUTHENTICATION_METHODS list. For example, if SECURITY_INTEGRATIONS contains a SAML security integration, and AUTHENTICATION_METHODS contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
+            security_integrations: (Set of String) A list of security integrations the authentication policy is associated with. This parameter has no effect when saml or oauth are not in the authentication_methods list. All values in the security_integrations list must be compatible with the values in the authentication_methods list. For example, if security_integrations contains a SAML security integration, and authentication_methods contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
             show_output: (List of Object) Outputs the result of SHOW AUTHENTICATION POLICIES for the given policy. (see below for nested schema)
             timeouts: (Block, Optional) (see below for nested schema)
             update: (String)
+            workload_identity_policy: '(Block List, Max: 1) Specifies the policy for workload identity federation. (see below for nested schema)'
         importStatements:
             - terraform import snowflake_authentication_policy.example '"<database_name>"."<schema_name>"."<authentication_policy_name>"'
     snowflake_compute_pool:
-        subCategory: Preview
+        subCategory: Stable
         description: Resource used to manage compute pools. For more information, check compute pools documentation https://docs.snowflake.com/en/sql-reference/sql/create-compute-pool. A compute pool is a collection of one or more virtual machine (VM) nodes on which Snowflake runs your Snowpark Container Services services (including job services). See Working with compute pools https://docs.snowflake.com/en/developer-guide/snowpark-container-services/working-with-compute-pool developer guide for more details.
         name: snowflake_compute_pool
         title: snowflake_compute_pool Resource - terraform-provider-snowflake
@@ -662,7 +703,7 @@ resources:
             id: (String) The ID of this resource.
             idle_nodes: (Number)
             initially_suspended: '(String) (Default: fallback to Snowflake default - uses special value that cannot be set in the configuration manually (default)) Specifies whether the compute pool is created initially in the suspended state. This field is used only when creating a compute pool. Changes on this field are ignored after creation.'
-            instance_family: '(String) Identifies the type of machine you want to provision for the nodes in the compute pool. Valid values are (case-insensitive): CPU_X64_XS | CPU_X64_S | CPU_X64_M | CPU_X64_L | HIGHMEM_X64_S | HIGHMEM_X64_M | HIGHMEM_X64_L | HIGHMEM_X64_SL | GPU_NV_S | GPU_NV_M | GPU_NV_L | GPU_NV_XS | GPU_NV_SM | GPU_NV_2M | GPU_NV_3M | GPU_NV_SL.'
+            instance_family: '(String) Identifies the type of machine you want to provision for the nodes in the compute pool. Valid values are (case-insensitive): CPU_X64_XS | CPU_X64_S | CPU_X64_M | CPU_X64_SL | CPU_X64_L | HIGHMEM_X64_S | HIGHMEM_X64_M | HIGHMEM_X64_L | HIGHMEM_X64_SL | GPU_NV_S | GPU_NV_M | GPU_NV_L | GPU_NV_XS | GPU_NV_SM | GPU_NV_2M | GPU_NV_3M | GPU_NV_SL | GPU_GCP_NV_L4_1_24G | GPU_GCP_NV_L4_4_24G | GPU_GCP_NV_A100_8_40G. Not all instance families are supported in all regions. Run SHOW COMPUTE POOL INSTANCE FAMILIES to see the list of supported instance families in your region.'
             is_exclusive: (Boolean)
             max_nodes: (Number) Specifies the maximum number of nodes for the compute pool.
             min_nodes: (Number) Specifies the minimum number of nodes for the compute pool.
@@ -994,7 +1035,6 @@ resources:
             resource_monitor: (String) Parameter that specifies the name of the resource monitor used to control all virtual warehouses created in the account. External changes for this field won't be detected. In case you want to apply external changes, you can re-create the resource manually using "terraform taint".
             rows_per_resultset: (Number) Specifies the maximum number of rows returned in a result set. A value of 0 specifies no maximum. For more information, check ROWS_PER_RESULTSET docs.
             s3_stage_vpce_dns_name: (String) Specifies the DNS name of an Amazon S3 interface endpoint. Requests sent to the internal stage of an account via AWS PrivateLink for Amazon S3 use this endpoint to connect. For more information, see Accessing Internal stages with dedicated interface endpoints. For more information, check S3_STAGE_VPCE_DNS_NAME docs.
-            saml_identity_provider: (String) Enables federated authentication. This deprecated parameter enables federated authentication (more details). For more information, check SAML_IDENTITY_PROVIDER docs.
             search_path: (String) Specifies the path to search to resolve unqualified object names in queries. For more information, see Name resolution in queries. Comma-separated list of identifiers. An identifier can be a fully or partially qualified schema name. For more information, check SEARCH_PATH docs.
             serverless_task_max_statement_size: '(String) Specifies the maximum allowed warehouse size for Serverless tasks. Valid values are (case-insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MAX_STATEMENT_SIZE docs.'
             serverless_task_min_statement_size: '(String) Specifies the minimum allowed warehouse size for Serverless tasks. Valid values are (case-insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MIN_STATEMENT_SIZE docs.'
@@ -1279,7 +1319,6 @@ resources:
             resource_monitor: (String) Parameter that specifies the name of the resource monitor used to control all virtual warehouses created in the account. External changes for this field won't be detected. In case you want to apply external changes, you can re-create the resource manually using "terraform taint".
             rows_per_resultset: (Number) Specifies the maximum number of rows returned in a result set. A value of 0 specifies no maximum. For more information, check ROWS_PER_RESULTSET docs.
             s3_stage_vpce_dns_name: (String) Specifies the DNS name of an Amazon S3 interface endpoint. Requests sent to the internal stage of an account via AWS PrivateLink for Amazon S3 use this endpoint to connect. For more information, see Accessing Internal stages with dedicated interface endpoints. For more information, check S3_STAGE_VPCE_DNS_NAME docs.
-            saml_identity_provider: (String) Enables federated authentication. This deprecated parameter enables federated authentication (more details). For more information, check SAML_IDENTITY_PROVIDER docs.
             search_path: (String) Specifies the path to search to resolve unqualified object names in queries. For more information, see Name resolution in queries. Comma-separated list of identifiers. An identifier can be a fully or partially qualified schema name. For more information, check SEARCH_PATH docs.
             serverless_task_max_statement_size: '(String) Specifies the maximum allowed warehouse size for Serverless tasks. Valid values are (case-insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MAX_STATEMENT_SIZE docs.'
             serverless_task_min_statement_size: '(String) Specifies the minimum allowed warehouse size for Serverless tasks. Valid values are (case-insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MIN_STATEMENT_SIZE docs.'
@@ -2549,7 +2588,7 @@ resources:
         importStatements:
             - terraform import snowflake_function_sql.example '"<database_name>"."<schema_name>"."<function_name>"(varchar, varchar, varchar)'
     snowflake_git_repository:
-        subCategory: Preview
+        subCategory: Stable
         description: Resource used to manage git repositories. For more information, check git repositories documentation https://docs.snowflake.com/en/sql-reference/sql/create-git-repository.
         name: snowflake_git_repository
         title: snowflake_git_repository Resource - terraform-provider-snowflake
@@ -3128,8 +3167,8 @@ resources:
             in_database: (String) The fully qualified name of the database. For more information about this resource, see docs.
             in_schema: (String) The fully qualified name of the schema. For more information about this resource, see docs.
             object_name: (String) Specifies the identifier for the object on which you are transferring ownership.
-            object_type: '(String) Specifies the type of object on which you are transferring ownership. Available values are: AGGREGATION POLICY | ALERT | AUTHENTICATION POLICY | COMPUTE POOL | DATA METRIC FUNCTION | DATABASE | DATABASE ROLE | DYNAMIC TABLE | EVENT TABLE | EXTERNAL TABLE | EXTERNAL VOLUME | FAILOVER GROUP | FILE FORMAT | FUNCTION | GIT REPOSITORY | HYBRID TABLE | ICEBERG TABLE | IMAGE REPOSITORY | INTEGRATION | MATERIALIZED VIEW | NETWORK POLICY | NETWORK RULE | PACKAGES POLICY | PIPE | PROCEDURE | MASKING POLICY | PASSWORD POLICY | PROJECTION POLICY | REPLICATION GROUP | RESOURCE MONITOR | ROLE | ROW ACCESS POLICY | SCHEMA | SESSION POLICY | SECRET | SEQUENCE | STAGE | STREAM | TABLE | TAG | TASK | USER | VIEW | WAREHOUSE'
-            object_type_plural: '(String) Specifies the type of object in plural form on which you are transferring ownership. Available values are: AGGREGATION POLICIES | ALERTS | AUTHENTICATION POLICIES | COMPUTE POOLS | DATA METRIC FUNCTIONS | DATABASES | DATABASE ROLES | DYNAMIC TABLES | EVENT TABLES | EXTERNAL TABLES | EXTERNAL VOLUMES | FAILOVER GROUPS | FILE FORMATS | FUNCTIONS | GIT REPOSITORIES | HYBRID TABLES | ICEBERG TABLES | IMAGE REPOSITORIES | INTEGRATIONS | MATERIALIZED VIEWS | NETWORK POLICIES | NETWORK RULES | PACKAGES POLICIES | PIPES | PROCEDURES | MASKING POLICIES | PASSWORD POLICIES | PROJECTION POLICIES | REPLICATION GROUPS | RESOURCE MONITORS | ROLES | ROW ACCESS POLICIES | SCHEMAS | SESSION POLICIES | SECRETS | SEQUENCES | STAGES | STREAMS | TABLES | TAGS | TASKS | USERS | VIEWS | WAREHOUSES. For more information head over to Snowflake documentation.'
+            object_type: '(String) Specifies the type of object on which you are transferring ownership. Available values are: AGGREGATION POLICY | ALERT | AUTHENTICATION POLICY | COMPUTE POOL | DATA METRIC FUNCTION | DATABASE | DATABASE ROLE | DYNAMIC TABLE | EVENT TABLE | EXTERNAL TABLE | EXTERNAL VOLUME | FAILOVER GROUP | FILE FORMAT | FUNCTION | GIT REPOSITORY | HYBRID TABLE | ICEBERG TABLE | IMAGE REPOSITORY | INTEGRATION | MATERIALIZED VIEW | NETWORK POLICY | NETWORK RULE | PACKAGES POLICY | PIPE | PROCEDURE | MASKING POLICY | PASSWORD POLICY | PROJECTION POLICY | REPLICATION GROUP | RESOURCE MONITOR | ROLE | ROW ACCESS POLICY | SCHEMA | SESSION POLICY | SECRET | SEMANTIC VIEW | SEQUENCE | STAGE | STREAM | TABLE | TAG | TASK | USER | VIEW | WAREHOUSE'
+            object_type_plural: '(String) Specifies the type of object in plural form on which you are transferring ownership. Available values are: AGGREGATION POLICIES | ALERTS | AUTHENTICATION POLICIES | COMPUTE POOLS | DATA METRIC FUNCTIONS | DATABASES | DYNAMIC TABLES | EVENT TABLES | EXTERNAL TABLES | EXTERNAL VOLUMES | FAILOVER GROUPS | FILE FORMATS | FUNCTIONS | GIT REPOSITORIES | HYBRID TABLES | ICEBERG TABLES | IMAGE REPOSITORIES | INTEGRATIONS | MATERIALIZED VIEWS | NETWORK POLICIES | NETWORK RULES | PACKAGES POLICIES | PIPES | PROCEDURES | MASKING POLICIES | PASSWORD POLICIES | PROJECTION POLICIES | REPLICATION GROUPS | RESOURCE MONITORS | ROLES | ROW ACCESS POLICIES | SCHEMAS | SESSION POLICIES | SECRETS | SEMANTIC VIEWS | SEQUENCES | STAGES | STREAMS | TABLES | TAGS | TASKS | USERS | VIEWS | WAREHOUSES. For more information head over to Snowflake documentation.'
             "on": '(Block List, Min: 1, Max: 1) Configures which object(s) should transfer their ownership to the specified role. (see below for nested schema)'
             outbound_privileges: field is set to COPY.
             outbound_privileges = "COPY": |-
@@ -3686,8 +3725,8 @@ resources:
             in_database: (String)
             in_schema: (String)
             object_name: (String) The fully qualified name of the object on which privileges will be granted.
-            object_type: '(String) The object type of the account object on which privileges will be granted. Valid values are: USER | RESOURCE MONITOR | WAREHOUSE | COMPUTE POOL | DATABASE | INTEGRATION | FAILOVER GROUP | REPLICATION GROUP | EXTERNAL VOLUME'
-            object_type_plural: '(String) The plural object type of the schema object on which privileges will be granted. Valid values are: AGGREGATION POLICIES | ALERTS | AUTHENTICATION POLICIES | CORTEX SEARCH SERVICES | DATA METRIC FUNCTIONS | DATASETS | DBT PROJECTS | DYNAMIC TABLES | EVENT TABLES | EXTERNAL TABLES | FILE FORMATS | FUNCTIONS | GIT REPOSITORIES | HYBRID TABLES | IMAGE REPOSITORIES | ICEBERG TABLES | JOIN POLICIES | MASKING POLICIES | MATERIALIZED VIEWS | MODELS | MODEL MONITORS | NETWORK RULES | NOTEBOOKS | PACKAGES POLICIES | PASSWORD POLICIES | PIPES | PRIVACY POLICIES | PROCEDURES | PROJECTION POLICIES | ROW ACCESS POLICIES | SECRETS | SEMANTIC VIEWS | SERVICES | SESSION POLICIES | SEQUENCES | SNAPSHOTS | SNAPSHOT POLICIES | SNAPSHOT SETS | STAGES | STREAMS | STREAMLITS | TABLES | TAGS | TASKS | VIEWS.'
+            object_type: '(String) The object type of the account object on which privileges will be granted. Valid values are: USER | RESOURCE MONITOR | WAREHOUSE | COMPUTE POOL | DATABASE | INTEGRATION | CONNECTION | FAILOVER GROUP | REPLICATION GROUP | EXTERNAL VOLUME'
+            object_type_plural: '(String) The plural object type of the schema object on which privileges will be granted. Valid values are: AGGREGATION POLICIES | ALERTS | AUTHENTICATION POLICIES | CORTEX SEARCH SERVICES | DATA METRIC FUNCTIONS | DATASETS | DBT PROJECTS | DYNAMIC TABLES | EVENT TABLES | EXTERNAL TABLES | FILE FORMATS | FUNCTIONS | GIT REPOSITORIES | HYBRID TABLES | IMAGE REPOSITORIES | ICEBERG TABLES | JOIN POLICIES | MASKING POLICIES | MATERIALIZED VIEWS | MODELS | MODEL MONITORS | NETWORK RULES | NOTEBOOKS | PACKAGES POLICIES | PASSWORD POLICIES | PIPES | PRIVACY POLICIES | PROCEDURES | PROJECTION POLICIES | ROW ACCESS POLICIES | SECRETS | SEMANTIC VIEWS | SERVICES | SESSION POLICIES | SEQUENCES | SNAPSHOTS | SNAPSHOT POLICIES | SNAPSHOT SETS | STAGES | STREAMS | STREAMLITS | ONLINE FEATURE TABLES | TABLES | TAGS | TASKS | VIEWS.'
             on_account: '(Boolean) (Default: false) If true, the privileges will be granted on the account.'
             on_account_object: '(Block List, Max: 1) Specifies the account object on which privileges will be granted (see below for nested schema)'
             on_schema: '(Block List, Max: 1) Specifies the schema on which privileges will be granted. (see below for nested schema)'
@@ -4138,8 +4177,8 @@ resources:
             in_database: (String) The fully qualified name of the database.
             in_schema: (String) The fully qualified name of the schema.
             object_name: (String) The fully qualified name of the object on which privileges will be granted.
-            object_type: '(String) The object type of the schema object on which privileges will be granted. Valid values are: AGGREGATION POLICY | ALERT | AUTHENTICATION POLICY | CORTEX SEARCH SERVICE | DATA METRIC FUNCTION | DATASET | DBT PROJECT | DYNAMIC TABLE | EVENT TABLE | EXTERNAL TABLE | FILE FORMAT | FUNCTION | GIT REPOSITORY | HYBRID TABLE | IMAGE REPOSITORY | ICEBERG TABLE | JOIN POLICY | MASKING POLICY | MATERIALIZED VIEW | MODEL | MODEL MONITOR | NETWORK RULE | NOTEBOOK | PACKAGES POLICY | PASSWORD POLICY | PIPE | PRIVACY POLICY | PROCEDURE | PROJECTION POLICY | ROW ACCESS POLICY | SECRET | SEMANTIC VIEW | SERVICE | SESSION POLICY | SEQUENCE | SNAPSHOT | SNAPSHOT POLICY | SNAPSHOT SET | STAGE | STREAM | STREAMLIT | TABLE | TAG | TASK | VIEW'
-            object_type_plural: '(String) The plural object type of the schema object on which privileges will be granted. Valid values are: AGGREGATION POLICIES | ALERTS | AUTHENTICATION POLICIES | CORTEX SEARCH SERVICES | DATA METRIC FUNCTIONS | DATASETS | DBT PROJECTS | DYNAMIC TABLES | EVENT TABLES | EXTERNAL TABLES | FILE FORMATS | FUNCTIONS | GIT REPOSITORIES | HYBRID TABLES | IMAGE REPOSITORIES | ICEBERG TABLES | JOIN POLICIES | MASKING POLICIES | MATERIALIZED VIEWS | MODELS | MODEL MONITORS | NETWORK RULES | NOTEBOOKS | PACKAGES POLICIES | PASSWORD POLICIES | PIPES | PRIVACY POLICIES | PROCEDURES | PROJECTION POLICIES | ROW ACCESS POLICIES | SECRETS | SEMANTIC VIEWS | SERVICES | SESSION POLICIES | SEQUENCES | SNAPSHOTS | SNAPSHOT POLICIES | SNAPSHOT SETS | STAGES | STREAMS | STREAMLITS | TABLES | TAGS | TASKS | VIEWS.'
+            object_type: '(String) The object type of the schema object on which privileges will be granted. Valid values are: AGGREGATION POLICY | ALERT | AUTHENTICATION POLICY | CORTEX SEARCH SERVICE | DATA METRIC FUNCTION | DATASET | DBT PROJECT | DYNAMIC TABLE | EVENT TABLE | EXTERNAL TABLE | FILE FORMAT | FUNCTION | GIT REPOSITORY | HYBRID TABLE | IMAGE REPOSITORY | ICEBERG TABLE | JOIN POLICY | MASKING POLICY | MATERIALIZED VIEW | MODEL | MODEL MONITOR | NETWORK RULE | NOTEBOOK | PACKAGES POLICY | PASSWORD POLICY | PIPE | PRIVACY POLICY | PROCEDURE | PROJECTION POLICY | ROW ACCESS POLICY | SECRET | SEMANTIC VIEW | SERVICE | SESSION POLICY | SEQUENCE | STORAGE LIFECYCLE POLICY | SNAPSHOT | SNAPSHOT POLICY | SNAPSHOT SET | STAGE | STREAM | STREAMLIT | ONLINE FEATURE TABLE | TABLE | TAG | TASK | VIEW | WORKSPACE'
+            object_type_plural: '(String) The plural object type of the schema object on which privileges will be granted. Valid values are: AGGREGATION POLICIES | ALERTS | AUTHENTICATION POLICIES | CORTEX SEARCH SERVICES | DATA METRIC FUNCTIONS | DATASETS | DBT PROJECTS | DYNAMIC TABLES | EVENT TABLES | EXTERNAL TABLES | FILE FORMATS | FUNCTIONS | GIT REPOSITORIES | HYBRID TABLES | IMAGE REPOSITORIES | ICEBERG TABLES | JOIN POLICIES | MASKING POLICIES | MATERIALIZED VIEWS | MODELS | MODEL MONITORS | NETWORK RULES | NOTEBOOKS | PACKAGES POLICIES | PASSWORD POLICIES | PIPES | PRIVACY POLICIES | PROCEDURES | PROJECTION POLICIES | ROW ACCESS POLICIES | SECRETS | SEMANTIC VIEWS | SERVICES | SESSION POLICIES | SEQUENCES | SNAPSHOTS | SNAPSHOT POLICIES | SNAPSHOT SETS | STAGES | STREAMS | STREAMLITS | ONLINE FEATURE TABLES | TABLES | TAGS | TASKS | VIEWS.'
             on_database: (String) The fully qualified name of the database on which privileges will be granted. For more information about this resource, see docs.
             on_schema: '(Block List, Max: 1) Specifies the schema on which privileges will be granted. (see below for nested schema)'
             on_schema_object: '(Block List, Max: 1) Specifies the schema object on which privileges will be granted. (see below for nested schema)'
@@ -4313,7 +4352,7 @@ resources:
             update: (String)
         importStatements: []
     snowflake_image_repository:
-        subCategory: Preview
+        subCategory: Stable
         description: Resource used to manage image repositories. For more information, check image repositories documentation https://docs.snowflake.com/en/sql-reference/sql/create-image-repository. Snowpark Container Services provides an OCIv2-compliant image registry service and a storage unit call repository to store images. See Working with an image registry and repository https://docs.snowflake.com/en/developer-guide/snowpark-container-services/working-with-registry-repository developer guide for more details.
         name: snowflake_image_repository
         title: snowflake_image_repository Resource - terraform-provider-snowflake
@@ -4666,6 +4705,7 @@ resources:
             has_mfa: (Boolean)
             has_password: (Boolean)
             has_rsa_public_key: (Boolean)
+            has_workload_identity: (Boolean)
             id: (String) The ID of this resource.
             jdbc_treat_decimal_as_int: (Boolean) Specifies how JDBC processes columns that have a scale of zero (0). For more information, check JDBC_TREAT_DECIMAL_AS_INT docs.
             jdbc_treat_timestamp_ntz_as_utc: (Boolean) Specifies how JDBC processes TIMESTAMP_NTZ values. For more information, check JDBC_TREAT_TIMESTAMP_NTZ_AS_UTC docs.
@@ -4728,7 +4768,7 @@ resources:
         importStatements:
             - terraform import snowflake_legacy_service_user.example '"<user_name>"'
     snowflake_listing:
-        subCategory: Preview
+        subCategory: Stable
         description: Resource used to manage listing objects. For more information, check listing documentation https://other-docs.snowflake.com/en/collaboration/collaboration-listings-about.
         name: snowflake_listing
         title: snowflake_listing Resource - terraform-provider-snowflake
@@ -4987,10 +5027,10 @@ resources:
             id: (String) The ID of this resource.
             is_secure: '(Boolean) (Default: false) Specifies that the view is secure.'
             name: (String) Specifies the identifier for the view; must be unique for the schema in which the view is created.
-            or_replace: '(Boolean) (Default: false) Overwrites the View if it exists.'
+            or_replace: '(Boolean) (Default: false) Specifies whether to use CREATE OR REPLACE when creating the materialized view. Note: this does not enable in-place updates when other fields forcing object recreation change; such fields always trigger delete and create operations in Terraform plan.'
             read: (String)
             schema: (String) The schema in which to create the view. Don't use the | character.
-            statement: (String) Specifies the query used to create the view.
+            statement: (String) Specifies the query used to create the view. Changing this value will trigger a drop and recreate of the materialized view.
             tag: (Block List, Deprecated) Definitions of a tag to associate with the resource. (see below for nested schema)
             timeouts: (Block, Optional) (see below for nested schema)
             update: (String)
@@ -5115,6 +5155,92 @@ resources:
             value_list: (Set of String) Specifies the network identifiers that will be allowed or blocked. Valid values in the list are determined by the type of network rule, see https://docs.snowflake.com/en/sql-reference/sql/create-network-rule#required-parameters for details.
         importStatements:
             - terraform import snowflake_network_rule.example 'databaseName|schemaName|networkRuleName'
+    snowflake_notebook:
+        subCategory: Preview
+        description: Resource used to manage notebooks. For more information, check notebooks documentation https://docs.snowflake.com/en/sql-reference/sql/create-notebook.
+        name: snowflake_notebook
+        title: snowflake_notebook Resource - terraform-provider-snowflake
+        examples:
+            - name: basic
+              manifest: |-
+                {
+                  "database": "DATABASE",
+                  "name": "NOTEBOOK",
+                  "schema": "SCHEMA"
+                }
+            - name: complete
+              manifest: |-
+                {
+                  "comment": "Lorem ipsum",
+                  "database": "DATABASE",
+                  "from": [
+                    {
+                      "path": "some/path",
+                      "stage": "${snowflake_stage.test.fully_qualified_name}"
+                    }
+                  ],
+                  "idle_auto_shutdown_time_seconds": 2400,
+                  "main_file": "my_notebook.ipynb",
+                  "name": "NOTEBOOK",
+                  "query_warehouse": "${snowflake_warehouse.test.name}",
+                  "schema": "SCHEMA",
+                  "warehouse": "${snowflake_warehouse.test.name}"
+                }
+              references:
+                from.stage: snowflake_stage.test.fully_qualified_name
+                query_warehouse: snowflake_warehouse.test.name
+                warehouse: snowflake_warehouse.test.name
+        argumentDocs:
+            code_warehouse: (String)
+            comment: (String) Specifies a comment for the notebook.
+            compute_pool: (String)
+            create: (String)
+            created_on: (String)
+            database: '(String) The database in which to create the notebook. Due to technical limitations (read more here), avoid using the following characters: |, ., ".'
+            database_name: (String)
+            default_packages: (String)
+            default_version: (String)
+            default_version_alias: (String)
+            default_version_git_commit_hash: (String)
+            default_version_location_uri: (String)
+            default_version_name: (String)
+            default_version_source_location_uri: (String)
+            delete: (String)
+            describe_output: (List of Object) Outputs the result of DESCRIBE NOTEBOOK for the given notebook. (see below for nested schema)
+            external_access_integrations: (String)
+            external_access_secrets: (String)
+            from: (Block List) Specifies the location in a stage of an .ipynb file from which the notebook should be created. MAIN_FILE parameter a user-specified identifier for the notebook file name must also be set alongside it. (see below for nested schema)
+            fully_qualified_name: (String) Fully qualified name of the resource. For more information, see object name resolution.
+            id: (String) The ID of this resource.
+            idle_auto_shutdown_time_seconds: (Number) Specifies the number of seconds of idle time before the notebook is shut down automatically.
+            import_urls: (String)
+            last_version_alias: (String)
+            last_version_git_commit_hash: (String)
+            last_version_location_uri: (String)
+            last_version_name: (String)
+            last_version_source_location_uri: (String)
+            live_version_location_uri: (String)
+            main_file: (String) Specifies a user-specified identifier for the notebook file name.
+            name: '(String) Specifies the identifier for the notebook; must be unique for the schema in which the notebook is created. Due to technical limitations (read more here), avoid using the following characters: |, ., ".'
+            owner: (String)
+            owner_role_type: (String)
+            path: (String) Location of the .ipynb file in the stage.
+            query_warehouse: (String) Specifies the warehouse where SQL queries in the notebook are run. Only upper-case identifiers are supported.
+            read: (String)
+            runtime_environment_version: (String)
+            runtime_name: (String)
+            schema: '(String) The schema in which to create the notebook. Due to technical limitations (read more here), avoid using the following characters: |, ., ".'
+            schema_name: (String)
+            show_output: (List of Object) Outputs the result of SHOW NOTEBOOKS for the given notebook (see below for nested schema)
+            stage: (String) Identifier of the stage where the .ipynb file is located.
+            timeouts: (Block, Optional) (see below for nested schema)
+            title: (String)
+            update: (String)
+            url_id: (String)
+            user_packages: (String)
+            warehouse: (String) Specifies the warehouse that runs the notebook kernel and python code. Only upper-case identifiers are supported.
+        importStatements:
+            - terraform import snowflake_notebook.example '"<db_name>"."<schema_name>"."<notebook_name>"'
     snowflake_notification_integration:
         subCategory: Preview
         name: snowflake_notification_integration
@@ -6147,7 +6273,7 @@ resources:
             remaining_credits: (Number)
             show_output: (List of Object) Outputs the result of SHOW RESOURCE MONITORS for the given resource monitor. (see below for nested schema)
             start_time: (String)
-            start_timestamp: (String) The date and time when the resource monitor starts monitoring credit usage for the assigned warehouses. If you set a start_timestamp for a resource monitor, you must also set frequency.  After removing this field from the config, the previously set value will be preserved on the Snowflake side, not the default value. That's due to Snowflake limitation and the lack of unset functionality for this parameter.
+            start_timestamp: (String) The date and time when the resource monitor starts monitoring credit usage for the assigned warehouses. If you set a start_timestamp for a resource monitor, you must also set frequency. If you specify the special value IMMEDIATELY, the current date is used. In this case, the field of this value in show_output may be not consistent across different Terraform runs. After removing this field from the config, the previously set value will be preserved on the Snowflake side, not the default value. That's due to Snowflake limitation and the lack of unset functionality for this parameter.
             suspend_at: (Number)
             suspend_immediate_at: (Number)
             suspend_immediate_trigger: (Number) Represents a numeric value specified as a percentage of the credit quota. Values over 100 are supported. After reaching this value, all assigned warehouses immediately cancel any currently running queries or statements. In addition, this action sends a notification to all users who have enabled notifications for themselves.
@@ -6424,7 +6550,7 @@ resources:
             name: '(String) String that specifies the identifier (i.e. name) for the integration; must be unique in your account. Due to technical limitations (read more here), avoid using the following characters: |, ., ".'
             network_policy: (String) Specifies an existing network policy that controls SCIM network traffic. For more information about this resource, see docs.
             read: (String)
-            run_as_role: '(String) Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. Valid options are: OKTA_PROVISIONER | AAD_PROVISIONER | GENERIC_SCIM_PROVISIONER.'
+            run_as_role: (String) Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. This field is case-sensitive. The exception is using generic_scim_provisioner, okta_provisioner, or aad_provisioner, which are automatically converted to uppercase for backwards compatibility.
             scim_client: '(String) Specifies the client type for the scim integration. Valid options are: OKTA | AZURE | GENERIC.'
             show_output: (List of Object) Outputs the result of SHOW SECURITY INTEGRATIONS for the given security integration. (see below for nested schema)
             sync_password: '(String) (Default: fallback to Snowflake default - uses special value that cannot be set in the configuration manually (default)) Specifies whether to enable or disable the synchronization of a user password from an Okta SCIM client as part of the API request to Snowflake. This property is not supported for Azure SCIM. Available options are: "true" or "false". When the value is not set in the configuration the provider will put "default" there which means to use the Snowflake default for this value.'
@@ -6858,6 +6984,198 @@ resources:
             username: (String)
         importStatements:
             - terraform import snowflake_secret_with_generic_string.example '"<database_name>"."<schema_name>"."<secret_name>"'
+    snowflake_semantic_view:
+        subCategory: Preview
+        description: Resource used to manage semantic views. For more information, check semantic views documentation https://docs.snowflake.com/en/sql-reference/sql/create-semantic-view.
+        name: snowflake_semantic_view
+        title: snowflake_semantic_view Resource - terraform-provider-snowflake
+        examples:
+            - name: basic
+              manifest: |-
+                {
+                  "database": "DATABASE",
+                  "metrics": [
+                    {
+                      "semantic_expression": [
+                        {
+                          "qualified_expression_name": "\"lt1\".\"m1\"",
+                          "sql_expression": "SUM(\"lt1\".\"a1\")"
+                        }
+                      ]
+                    }
+                  ],
+                  "name": "SEMANTIC_VIEW",
+                  "schema": "SCHEMA",
+                  "tables": [
+                    {
+                      "table_alias": "lt1",
+                      "table_name": "${snowflake_table.test.fully_qualified_name}"
+                    }
+                  ]
+                }
+              references:
+                tables.table_name: snowflake_table.test.fully_qualified_name
+            - name: complete
+              manifest: |-
+                {
+                  "comment": "comment",
+                  "database": "DATABASE",
+                  "dimensions": [
+                    {
+                      "comment": "dimension comment",
+                      "qualified_expression_name": "\"lt1\".\"d2\"",
+                      "sql_expression": "\"lt1\".\"a2\"",
+                      "synonym": [
+                        "dim2"
+                      ]
+                    }
+                  ],
+                  "facts": [
+                    {
+                      "comment": "fact comment",
+                      "qualified_expression_name": "\"lt1\".\"f2\"",
+                      "sql_expression": "\"lt1\".\"a1\"",
+                      "synonym": [
+                        "fact2"
+                      ]
+                    }
+                  ],
+                  "metrics": [
+                    {
+                      "semantic_expression": [
+                        {
+                          "comment": "semantic expression comment",
+                          "qualified_expression_name": "\"lt1\".\"m1\"",
+                          "sql_expression": "SUM(\"lt1\".\"a1\")",
+                          "synonym": [
+                            "sem1",
+                            "baseSem"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "window_function": [
+                        {
+                          "over_clause": [
+                            {
+                              "partition_by": "\"lt1\".\"d2\""
+                            }
+                          ],
+                          "qualified_expression_name": "\"lt1\".\"wf1\"",
+                          "sql_expression": "SUM(\"lt1\".\"m1\")"
+                        }
+                      ]
+                    }
+                  ],
+                  "name": "SEMANTIC_VIEW",
+                  "relationships": [
+                    {
+                      "referenced_relationship_columns": [
+                        "a1",
+                        "a2"
+                      ],
+                      "referenced_table_name_or_alias": [
+                        {
+                          "table_alias": "lt1"
+                        }
+                      ],
+                      "relationship_columns": [
+                        "a1",
+                        "a2"
+                      ],
+                      "relationship_identifier": "r2",
+                      "table_name_or_alias": [
+                        {
+                          "table_alias": "lt2"
+                        }
+                      ]
+                    }
+                  ],
+                  "schema": "SCHEMA",
+                  "tables": [
+                    {
+                      "comment": "logical table 1 comment",
+                      "primary_key": [
+                        "a1"
+                      ],
+                      "synonym": [
+                        "orders",
+                        "sales"
+                      ],
+                      "table_alias": "lt1",
+                      "table_name": "${snowflake_table.test.fully_qualified_name}",
+                      "unique": [
+                        {
+                          "values": [
+                            "a2"
+                          ]
+                        },
+                        {
+                          "values": [
+                            "a3",
+                            "a4"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "comment": "logical table 2 comment",
+                      "primary_key": [
+                        "a1"
+                      ],
+                      "table_alias": "lt2",
+                      "table_name": "${snowflake_table.test2.fully_qualified_name}"
+                    }
+                  ]
+                }
+              references:
+                tables.table_name: snowflake_table.test2.fully_qualified_name
+        argumentDocs:
+            comment: (String) Specifies a comment for the semantic view.
+            create: (String)
+            created_on: (String)
+            database: '(String) The database in which to create the semantic view. Due to technical limitations (read more here), avoid using the following characters: |, ., ".'
+            database_name: (String)
+            delete: (String)
+            dimensions: (Block List) The list of dimensions in the semantic view. External changes for this field won't be detected. In case you want to apply external changes, you can re-create the resource manually using "terraform taint". (see below for nested schema)
+            extension: (String)
+            facts: (Block List) The list of facts in the semantic view. External changes for this field won't be detected. In case you want to apply external changes, you can re-create the resource manually using "terraform taint". (see below for nested schema)
+            fully_qualified_name: (String) Fully qualified name of the resource. For more information, see object name resolution.
+            id: (String) The ID of this resource.
+            metrics: (Block List) Specify a list of metrics for the semantic view. Each metric can have either a semantic expression or a window function in its definition. External changes for this field won't be detected. In case you want to apply external changes, you can re-create the resource manually using "terraform taint". (see below for nested schema)
+            name: '(String) Specifies the identifier for the semantic view; must be unique within the schema. Due to technical limitations (read more here), avoid using the following characters: |, ., ".'
+            order_by: (String) Specifies an order by clause. It must be a complete SQL expression, including any [ ASC | DESC ] [ NULLS { FIRST | LAST } ] modifiers.
+            over_clause: '(Block List, Min: 1, Max: 1) Specify the partition by, order by or frame over which the window function is to be computed. (see below for nested schema)'
+            owner: (String)
+            owner_role_type: (String)
+            partition_by: (String) Specifies a partition by clause.
+            primary_key: (List of String) Definitions of primary keys in the logical table. This field is case-sensitive - the provider uses double quotes to wrap it when sending the SQL to Snowflake.
+            qualified_expression_name: '(String) Specifies a qualified name for the dimension, including the table name and a unique identifier for the dimension: <table_alias>.<semantic_expression_name>. Remember to wrap each part in double quotes like "\"<table_alias>\".\"<semantic_expression_name>\"".'
+            read: (String)
+            referenced_relationship_columns: (List of String) Specifies one or more columns in the second logical table that are referred to by the first logical table. Column names in this list are case-sensitive - the provider uses double quotes to wrap each of them when sending the SQL to Snowflake.
+            referenced_table_name_or_alias: '(Block List, Min: 1, Max: 1) Specifies the other logical table and one or more of its columns that are referred to by the first logical table. Each referenced table can have either a table_name or a table_alias, not both. (see below for nested schema)'
+            relationship_columns: (List of String) Specifies one or more columns in the first logical table that refers to columns in another logical table. Column names in this list are case-sensitive - the provider uses double quotes to wrap each of them when sending the SQL to Snowflake.
+            relationship_identifier: (String) Specifies an optional identifier for the relationship. This field is case-sensitive - the provider uses double quotes to wrap it when sending the SQL to Snowflake.
+            relationships: (Block List) The list of relationships between the logical tables in the semantic view. External changes for this field won't be detected. In case you want to apply external changes, you can re-create the resource manually using "terraform taint". (see below for nested schema)
+            schema: '(String) The schema in which to create the semantic view. Due to technical limitations (read more here), avoid using the following characters: |, ., ".'
+            schema_name: (String)
+            semantic_expression: '(Block List, Max: 1) Specifies a semantic expression for a metric definition. Cannot be used in combination with a window function. (see below for nested schema)'
+            show_output: (List of Object) Outputs the result of SHOW SEMANTIC VIEWS for the given semantic view. (see below for nested schema)
+            sql_expression: (String) The SQL expression used to compute the dimension.
+            synonym: (Set of String) List of synonyms for the logical table.
+            table_alias: (String) Specifies an alias for a logical table in the semantic view. This field is case-sensitive - the provider uses double quotes to wrap it when sending the SQL to Snowflake.
+            table_name: '(String) Specifies an identifier for the logical table. Example: "\"<db_name>\".\"<schema_name>\".\"<table_name>\"". Due to technical limitations (read more here), avoid using the following characters: |, ., ".'
+            table_name_or_alias: '(Block List, Min: 1, Max: 1) Specifies one of the logical tables that refers to columns in another logical table. Each table can have either a table_name or a table_alias, not both. (see below for nested schema)'
+            tables: '(Block List, Min: 1) The list of logical tables in the semantic view. External changes for this field won''t be detected. In case you want to apply external changes, you can re-create the resource manually using "terraform taint". (see below for nested schema)'
+            timeouts: (Block, Optional) (see below for nested schema)
+            unique: (Block List) Definitions of unique key combinations in the logical table. This field is case-sensitive - the provider uses double quotes to wrap it when sending the SQL to Snowflake. (see below for nested schema)
+            update: (String)
+            values: (List of String) Unique key combinations in the logical table.
+            window_frame_clause: (String) Specifies a window frame clause.
+            window_function: '(Block List, Max: 1) Specifies a window function for a metric definition. Cannot be used in combination with a semantic expression. (see below for nested schema)'
+        importStatements:
+            - terraform import snowflake_semantic_view.example '"<db_name>"."<schema_name>"."<semantic_view_name>"'
     snowflake_sequence:
         subCategory: Preview
         name: snowflake_sequence
@@ -6903,7 +7221,7 @@ resources:
               # format is database name | schema name | sequence name
               terraform import snowflake_sequence.example 'dbName|schemaName|sequenceName'
     snowflake_service:
-        subCategory: Preview
+        subCategory: Stable
         description: Resource used to manage services. For more information, check services documentation https://docs.snowflake.com/en/sql-reference/sql/create-service. A long-running service is like a web service that does not end automatically. After you create a service, Snowflake manages the running service. For example, if a service container stops, for whatever reason, Snowflake restarts that container so the service runs uninterrupted. See Working with services https://docs.snowflake.com/en/developer-guide/snowpark-container-services/working-with-services developer guide for more details.
         name: snowflake_service
         title: snowflake_service Resource - terraform-provider-snowflake
@@ -7283,6 +7601,7 @@ resources:
             has_mfa: (Boolean)
             has_password: (Boolean)
             has_rsa_public_key: (Boolean)
+            has_workload_identity: (Boolean)
             id: (String) The ID of this resource.
             jdbc_treat_decimal_as_int: (Boolean) Specifies how JDBC processes columns that have a scale of zero (0). For more information, check JDBC_TREAT_DECIMAL_AS_INT docs.
             jdbc_treat_timestamp_ntz_as_utc: (Boolean) Specifies how JDBC processes TIMESTAMP_NTZ values. For more information, check JDBC_TREAT_TIMESTAMP_NTZ_AS_UTC docs.
@@ -8691,6 +9010,36 @@ resources:
                   "started": true,
                   "warehouse": "warehouse"
                 }
+            - name: task_seconds
+              manifest: |-
+                {
+                  "database": "database",
+                  "name": "task_seconds",
+                  "schedule": [
+                    {
+                      "seconds": 30
+                    }
+                  ],
+                  "schema": "schema",
+                  "sql_statement": "select 1",
+                  "started": true,
+                  "warehouse": "warehouse"
+                }
+            - name: task_hours
+              manifest: |-
+                {
+                  "database": "database",
+                  "name": "task_hours",
+                  "schedule": [
+                    {
+                      "hours": 2
+                    }
+                  ],
+                  "schema": "schema",
+                  "sql_statement": "select 1",
+                  "started": true,
+                  "warehouse": "warehouse"
+                }
             - name: serverless_task
               manifest: |-
                 {
@@ -8733,6 +9082,43 @@ resources:
                 }
               references:
                 finalize: snowflake_task.root_task.fully_qualified_name
+            - name: complete_child_task
+              manifest: |-
+                {
+                  "abort_detached_query": false,
+                  "after": [
+                    "${snowflake_task.root_task.fully_qualified_name}"
+                  ],
+                  "allow_overlapping_execution": true,
+                  "autocommit": true,
+                  "binary_input_format": "HEX",
+                  "binary_output_format": "HEX",
+                  "comment": "complete child task with all parameters",
+                  "config": "{\"output_dir\": \"/temp/\", \"learning_rate\": 0.1}",
+                  "database": "database",
+                  "error_integration": "${snowflake_notification_integration.example.fully_qualified_name}",
+                  "json_indent": 4,
+                  "lock_timeout": 21600,
+                  "log_level": "INFO",
+                  "name": "complete_child_task",
+                  "query_tag": "child_task_query",
+                  "schema": "schema",
+                  "serverless_task_max_statement_size": "LARGE",
+                  "serverless_task_min_statement_size": "SMALL",
+                  "sql_statement": "CALL my_stored_procedure()",
+                  "started": true,
+                  "statement_timeout_in_seconds": 86400,
+                  "suspend_task_after_num_failures": 5,
+                  "target_completion_interval": "10 MINUTES",
+                  "task_auto_retry_attempts": 3,
+                  "timezone": "America/New_York",
+                  "user_task_managed_initial_warehouse_size": "MEDIUM",
+                  "user_task_minimum_trigger_interval_in_seconds": 60,
+                  "user_task_timeout_ms": 7200000,
+                  "when": "SYSTEM$STREAM_HAS_DATA('my_stream')"
+                }
+              references:
+                error_integration: snowflake_notification_integration.example.fully_qualified_name
             - name: test
               manifest: |-
                 {
@@ -8852,6 +9238,7 @@ resources:
             fully_qualified_name: (String) Fully qualified name of the resource. For more information, see object name resolution.
             geography_output_format: (String) Display format for GEOGRAPHY values. For more information, check GEOGRAPHY_OUTPUT_FORMAT docs.
             geometry_output_format: (String) Display format for GEOMETRY values. For more information, check GEOMETRY_OUTPUT_FORMAT docs.
+            hours: (Number) Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, minutes, and using_cron)
             id: (String) The ID of this resource.
             jdbc_treat_timestamp_ntz_as_utc: (Boolean) Specifies how JDBC processes TIMESTAMP_NTZ values. For more information, check JDBC_TREAT_TIMESTAMP_NTZ_AS_UTC docs.
             jdbc_use_session_timezone: (Boolean) Specifies whether the JDBC Driver uses the time zone of the JVM or the time zone of the session (specified by the TIMEZONE parameter) for the getDate(), getTime(), and getTimestamp() methods of the ResultSet class. For more information, check JDBC_USE_SESSION_TIMEZONE docs.
@@ -8863,7 +9250,7 @@ resources:
             level: (String)
             lock_timeout: (Number) Number of seconds to wait while trying to lock a resource, before timing out and aborting the statement. For more information, check LOCK_TIMEOUT docs.
             log_level: (String) Specifies the severity level of messages that should be ingested and made available in the active event table. Messages at the specified level (and at more severe levels) are ingested. For more information about log levels, see Setting log level. For more information, check LOG_LEVEL docs.
-            minutes: (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers only. (conflicts with using_cron)
+            minutes: (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, hours, and using_cron)
             multi_statement_count: (Number) Number of statements to execute when using the multi-statement capability. For more information, check MULTI_STATEMENT_COUNT docs.
             name: '(String) Specifies the identifier for the task; must be unique for the database and schema in which the task is created. Due to technical limitations (read more here), avoid using the following characters: |, ., ".'
             noorder_sequence_as_default: (Boolean) Specifies whether the ORDER or NOORDER property is set by default when you create a new sequence or add a new table column. The ORDER and NOORDER properties determine whether or not the values are generated for the sequence or auto-incremented column in increasing or decreasing order. For more information, check NOORDER_SEQUENCE_AS_DEFAULT docs.
@@ -8877,10 +9264,13 @@ resources:
             read: (String)
             rows_per_resultset: (Number) Specifies the maximum number of rows returned in a result set. A value of 0 specifies no maximum. For more information, check ROWS_PER_RESULTSET docs.
             s3_stage_vpce_dns_name: (String) Specifies the DNS name of an Amazon S3 interface endpoint. Requests sent to the internal stage of an account via AWS PrivateLink for Amazon S3 use this endpoint to connect. For more information, see Accessing Internal stages with dedicated interface endpoints. For more information, check S3_STAGE_VPCE_DNS_NAME docs.
-            schedule: '(Block List, Max: 1) The schedule for periodically running the task. This can be a cron or interval in minutes. (Conflicts with finalize and after; when set, one of the sub-fields minutes or using_cron should be set) (see below for nested schema)'
+            schedule: '(Block List, Max: 1) The schedule for periodically running the task. This can be a cron or interval in seconds, minutes, or hours. (Conflicts with finalize and after; when set, one of the sub-fields seconds, minutes, hours, or using_cron should be set) For Triggered tasks, a schedule is not required. For other tasks, a schedule must be defined for a standalone task or the root task in a task graph; otherwise, the task only runs if manually executed using EXECUTE TASK in, for example, the snowflake_execute resource. A schedule cannot be specified for child tasks in a task graph. For more information on schedule restrictions, consult the official documentation for Task object. (see below for nested schema)'
             schema: '(String) The schema in which to create the task. Due to technical limitations (read more here), avoid using the following characters: |, ., ".'
             schema_name: (String)
             search_path: (String) Specifies the path to search to resolve unqualified object names in queries. For more information, see Name resolution in queries. Comma-separated list of identifiers. An identifier can be a fully or partially qualified schema name. For more information, check SEARCH_PATH docs.
+            seconds: (Number) Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with minutes, hours, and using_cron)
+            serverless_task_max_statement_size: '(String) Specifies the maximum warehouse size for serverless tasks. Valid values are (case-insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MAX_STATEMENT_SIZE docs.'
+            serverless_task_min_statement_size: '(String) Specifies the minimum warehouse size for serverless tasks. Valid values are (case-insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MIN_STATEMENT_SIZE docs.'
             show_output: (List of Object) Outputs the result of SHOW TASKS for the given task. (see below for nested schema)
             sql_statement: (String) Any single SQL statement, or a call to a stored procedure, executed when the task runs.
             started: (Boolean) Specifies if the task should be started or suspended.
@@ -8889,6 +9279,7 @@ resources:
             statement_timeout_in_seconds: (Number) Amount of time, in seconds, after which a running SQL statement (query, DDL, DML, etc.) is canceled by the system. For more information, check STATEMENT_TIMEOUT_IN_SECONDS docs.
             strict_json_output: (Boolean) This parameter specifies whether JSON output in a session is compatible with the general standard (as described by http://json.org). By design, Snowflake allows JSON input that contains non-standard values; however, these non-standard values might result in Snowflake outputting JSON that is incompatible with other platforms and languages. This parameter, when enabled, ensures that Snowflake outputs valid/compatible JSON. For more information, check STRICT_JSON_OUTPUT docs.
             suspend_task_after_num_failures: (Number) Specifies the number of consecutive failed task runs after which the current task is suspended automatically. The default is 0 (no automatic suspension). For more information, check SUSPEND_TASK_AFTER_NUM_FAILURES docs.
+            target_completion_interval: '(Block List, Max: 1) Specifies the target completion interval for tasks. This can be specified in hours, minutes, or seconds. (when set, one of the sub-fields hours, minutes, or seconds should be set) (see below for nested schema)'
             task_auto_retry_attempts: (Number) Specifies the number of automatic task graph retry attempts. If any task graphs complete in a FAILED state, Snowflake can automatically retry the task graphs from the last task in the graph that failed. For more information, check TASK_AUTO_RETRY_ATTEMPTS docs.
             task_relations: (List of Object) (see below for nested schema)
             time_input_format: (String) Specifies the input format for the TIME data type. For more information, see Date and time input and output formats. Any valid, supported time format or AUTO (AUTO specifies that Snowflake attempts to automatically detect the format of times stored in the system during the session). For more information, check TIME_INPUT_FORMAT docs.
@@ -8912,7 +9303,7 @@ resources:
             user_task_managed_initial_warehouse_size: '(String) Specifies the size of the compute resources to provision for the first run of the task, before a task history is available for Snowflake to determine an ideal size. Once a task has successfully completed a few runs, Snowflake ignores this parameter setting. Valid values are (case-insensitive): %s. (Conflicts with warehouse). For more information about warehouses, see docs. For more information, check USER_TASK_MANAGED_INITIAL_WAREHOUSE_SIZE docs.'
             user_task_minimum_trigger_interval_in_seconds: (Number) Minimum amount of time between Triggered Task executions in seconds For more information, check USER_TASK_MINIMUM_TRIGGER_INTERVAL_IN_SECONDS docs.
             user_task_timeout_ms: (Number) Specifies the time limit on a single run of the task before it times out (in milliseconds). For more information, check USER_TASK_TIMEOUT_MS docs.
-            using_cron: (String) Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with minutes)
+            using_cron: (String) Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with seconds, minutes, and hours)
             value: (String)
             warehouse: (String) The warehouse the task will use. Omit this parameter to use Snowflake-managed compute resources for runs of this task. Due to Snowflake limitations warehouse identifier can consist of only upper-cased letters. (Conflicts with user_task_managed_initial_warehouse_size) For more information about this resource, see docs.
             week_of_year_policy: '(Number) Specifies how the weeks in a given year are computed. 0: The semantics used are equivalent to the ISO semantics, in which a week belongs to a given year if at least 4 days of that week are in that year. 1: January 1 is included in the first week of the year and December 31 is included in the last week of the year. For more information, check WEEK_OF_YEAR_POLICY docs.'
@@ -9073,6 +9464,7 @@ resources:
             has_mfa: (Boolean)
             has_password: (Boolean)
             has_rsa_public_key: (Boolean)
+            has_workload_identity: (Boolean)
             id: (String) The ID of this resource.
             jdbc_treat_decimal_as_int: (Boolean) Specifies how JDBC processes columns that have a scale of zero (0). For more information, check JDBC_TREAT_DECIMAL_AS_INT docs.
             jdbc_treat_timestamp_ntz_as_utc: (Boolean) Specifies how JDBC processes TIMESTAMP_NTZ values. For more information, check JDBC_TREAT_TIMESTAMP_NTZ_AS_UTC docs.
@@ -9212,7 +9604,7 @@ resources:
         importStatements:
             - terraform import snowflake_user_password_policy_attachment.example "MY_DATABASE|MY_SCHEMA|PASSWORD_POLICY_NAME|USER_NAME"
     snowflake_user_programmatic_access_token:
-        subCategory: Preview
+        subCategory: Stable
         description: Resource used to manage user programmatic access tokens. For more information, check user programmatic access tokens documentation https://docs.snowflake.com/en/sql-reference/sql/alter-user-add-programmatic-access-token. A programmatic access token is a token that can be used to authenticate to an endpoint. See Using programmatic access tokens for authentication https://docs.snowflake.com/en/user-guide/programmatic-access-tokens user guide for more details.
         name: snowflake_user_programmatic_access_token
         title: snowflake_user_programmatic_access_token Resource - terraform-provider-snowflake

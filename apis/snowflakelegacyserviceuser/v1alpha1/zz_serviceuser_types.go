@@ -2088,6 +2088,9 @@ type ShowOutputObservation struct {
 	// (Boolean)
 	HasRsaPublicKey *bool `json:"hasRsaPublicKey,omitempty" tf:"has_rsa_public_key,omitempty"`
 
+	// (Boolean)
+	HasWorkloadIdentity *bool `json:"hasWorkloadIdentity,omitempty" tf:"has_workload_identity,omitempty"`
+
 	// (String)
 	LastName *string `json:"lastName,omitempty" tf:"last_name,omitempty"`
 
