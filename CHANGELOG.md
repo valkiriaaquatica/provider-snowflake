@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/valkiriaaquatica/provider-snowflake/compare/v1.2.0...v1.3.0) (2026-01-03)
+
+
+### Features
+
+* **deps:** update dependency snowflakedb/terraform-provider-snowflake to v2.12.0 ([#24](https://github.com/valkiriaaquatica/provider-snowflake/issues/24)) ([86ff0db](https://github.com/valkiriaaquatica/provider-snowflake/commit/86ff0db94920d03afdb07593d2bb8db8ff4a79c2))
+
 ## [1.2.0](https://github.com/valkiriaaquatica/provider-snowflake/compare/v1.1.0...v1.2.0) (2025-10-17)
 
 
