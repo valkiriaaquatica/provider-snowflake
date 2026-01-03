@@ -48,7 +48,7 @@ type DescribeOutputObservation struct {
 	// (String) Specifies an existing network policy that controls SCIM network traffic. For more information about this resource, see docs.
 	NetworkPolicy []NetworkPolicyObservation `json:"networkPolicy,omitempty" tf:"network_policy,omitempty"`
 
-	// (String) Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. Valid options are: OKTA_PROVISIONER | AAD_PROVISIONER | GENERIC_SCIM_PROVISIONER.
+	// sensitive. The exception is using generic_scim_provisioner, okta_provisioner, or aad_provisioner, which are automatically converted to uppercase for backwards compatibility.
 	RunAsRole []RunAsRoleObservation `json:"runAsRole,omitempty" tf:"run_as_role,omitempty"`
 
 	// uses special value that cannot be set in the configuration manually (default)) Specifies whether to enable or disable the synchronization of a user password from an Okta SCIM client as part of the API request to Snowflake. This property is not supported for Azure SCIM. Available options are: "true" or "false". When the value is not set in the configuration the provider will put "default" there which means to use the Snowflake default for this value.
@@ -97,8 +97,8 @@ type IntegrationInitParameters struct {
 	// Specifies an existing network policy that controls SCIM network traffic. For more information about this resource, see [docs](./network_policy).
 	NetworkPolicy *string `json:"networkPolicy,omitempty" tf:"network_policy,omitempty"`
 
-	// (String) Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. Valid options are: OKTA_PROVISIONER | AAD_PROVISIONER | GENERIC_SCIM_PROVISIONER.
-	// Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. Valid options are: `OKTA_PROVISIONER` | `AAD_PROVISIONER` | `GENERIC_SCIM_PROVISIONER`.
+	// sensitive. The exception is using generic_scim_provisioner, okta_provisioner, or aad_provisioner, which are automatically converted to uppercase for backwards compatibility.
+	// Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. This field is case-sensitive. The exception is using `generic_scim_provisioner`, `okta_provisioner`, or `aad_provisioner`, which are automatically converted to uppercase for backwards compatibility.
 	RunAsRole *string `json:"runAsRole,omitempty" tf:"run_as_role,omitempty"`
 
 	// (String) Specifies the client type for the scim integration. Valid options are: OKTA | AZURE | GENERIC.
@@ -139,8 +139,8 @@ type IntegrationObservation struct {
 	// Specifies an existing network policy that controls SCIM network traffic. For more information about this resource, see [docs](./network_policy).
 	NetworkPolicy *string `json:"networkPolicy,omitempty" tf:"network_policy,omitempty"`
 
-	// (String) Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. Valid options are: OKTA_PROVISIONER | AAD_PROVISIONER | GENERIC_SCIM_PROVISIONER.
-	// Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. Valid options are: `OKTA_PROVISIONER` | `AAD_PROVISIONER` | `GENERIC_SCIM_PROVISIONER`.
+	// sensitive. The exception is using generic_scim_provisioner, okta_provisioner, or aad_provisioner, which are automatically converted to uppercase for backwards compatibility.
+	// Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. This field is case-sensitive. The exception is using `generic_scim_provisioner`, `okta_provisioner`, or `aad_provisioner`, which are automatically converted to uppercase for backwards compatibility.
 	RunAsRole *string `json:"runAsRole,omitempty" tf:"run_as_role,omitempty"`
 
 	// (String) Specifies the client type for the scim integration. Valid options are: OKTA | AZURE | GENERIC.
@@ -178,8 +178,8 @@ type IntegrationParameters struct {
 	// +kubebuilder:validation:Optional
 	NetworkPolicy *string `json:"networkPolicy,omitempty" tf:"network_policy,omitempty"`
 
-	// (String) Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. Valid options are: OKTA_PROVISIONER | AAD_PROVISIONER | GENERIC_SCIM_PROVISIONER.
-	// Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. Valid options are: `OKTA_PROVISIONER` | `AAD_PROVISIONER` | `GENERIC_SCIM_PROVISIONER`.
+	// sensitive. The exception is using generic_scim_provisioner, okta_provisioner, or aad_provisioner, which are automatically converted to uppercase for backwards compatibility.
+	// Specify the SCIM role in Snowflake that owns any users and roles that are imported from the identity provider into Snowflake using SCIM. Provider assumes that the specified role is already provided. This field is case-sensitive. The exception is using `generic_scim_provisioner`, `okta_provisioner`, or `aad_provisioner`, which are automatically converted to uppercase for backwards compatibility.
 	// +kubebuilder:validation:Optional
 	RunAsRole *string `json:"runAsRole,omitempty" tf:"run_as_role,omitempty"`
 

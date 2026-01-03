@@ -4350,6 +4350,11 @@ func (in *ShowOutputObservation) DeepCopyInto(out *ShowOutputObservation) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.HasWorkloadIdentity != nil {
+		in, out := &in.HasWorkloadIdentity, &out.HasWorkloadIdentity
+		*out = new(bool)
+		**out = **in
+	}
 	if in.LastName != nil {
 		in, out := &in.LastName, &out.LastName
 		*out = new(string)

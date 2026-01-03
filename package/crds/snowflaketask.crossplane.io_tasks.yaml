@@ -273,19 +273,29 @@ spec:
                     type: string
                   schedule:
                     description: |-
-                      fields minutes or using_cron should be set) (see below for nested schema)
-                      The schedule for periodically running the task. This can be a cron or interval in minutes. (Conflicts with finalize and after; when set, one of the sub-fields `minutes` or `using_cron` should be set)
+                      fields seconds, minutes, hours, or using_cron should be set) For Triggered tasks, a schedule is not required. For other tasks, a schedule must be defined for a standalone task or the root task in a task graph; otherwise, the task only runs if manually executed using EXECUTE TASK in, for example, the snowflake_execute resource. A schedule cannot be specified for child tasks in a task graph. For more information on schedule restrictions, consult the official documentation for Task object. (see below for nested schema)
+                      The schedule for periodically running the task. This can be a cron or interval in seconds, minutes, or hours. (Conflicts with finalize and after; when set, one of the sub-fields `seconds`, `minutes`, `hours`, or `using_cron` should be set) For [Triggered tasks](https://docs.snowflake.com/en/user-guide/tasks-triggered), a schedule is not required. For other tasks, a schedule must be defined for a standalone task or the root task in a [task graph](https://docs.snowflake.com/en/user-guide/tasks-graphs#label-task-dag); otherwise, the task only runs if manually executed using [EXECUTE TASK](https://docs.snowflake.com/en/sql-reference/sql/execute-task) in, for example, the [snowflake_execute](https://registry.io/providers/snowflakedb/snowflake/latest/docs/resources/execute) resource. A schedule cannot be specified for child tasks in a task graph. For more information on schedule restrictions, consult the [official documentation for Task object](https://docs.snowflake.com/en/user-guide/tasks-intro).
                     items:
                       properties:
+                        hours:
+                          description: |-
+                            (Number) Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, minutes, and using_cron)
+                            Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with `seconds`, `minutes`, and `using_cron`)
+                          type: number
                         minutes:
                           description: |-
-                            (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers only. (conflicts with using_cron)
-                            Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers only. (conflicts with `using_cron`)
+                            (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, hours, and using_cron)
+                            Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with `seconds`, `hours`, and `using_cron`)
+                          type: number
+                        seconds:
+                          description: |-
+                            (Number) Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with minutes, hours, and using_cron)
+                            Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with `minutes`, `hours`, and `using_cron`)
                           type: number
                         usingCron:
                           description: |-
-                            (String) Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with minutes)
-                            Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with `minutes`)
+                            (String) Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with seconds, minutes, and hours)
+                            Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with `seconds`, `minutes`, and `hours`)
                           type: string
                       type: object
                     type: array
@@ -298,6 +308,16 @@ spec:
                     description: |-
                       separated list of identifiers. An identifier can be a fully or partially qualified schema name. For more information, check SEARCH_PATH docs.
                       Specifies the path to search to resolve unqualified object names in queries. For more information, see [Name resolution in queries](https://docs.snowflake.com/en/sql-reference/name-resolution.html#label-object-name-resolution-search-path). Comma-separated list of identifiers. An identifier can be a fully or partially qualified schema name. For more information, check [SEARCH_PATH docs](https://docs.snowflake.com/en/sql-reference/parameters#search-path).
+                    type: string
+                  serverlessTaskMaxStatementSize:
+                    description: |-
+                      insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MAX_STATEMENT_SIZE docs.
+                      Specifies the maximum warehouse size for serverless tasks. Valid values are (case-insensitive): `XSMALL` | `X-SMALL` | `SMALL` | `MEDIUM` | `LARGE` | `XLARGE` | `X-LARGE` | `XXLARGE` | `X2LARGE` | `2X-LARGE` | `XXXLARGE` | `X3LARGE` | `3X-LARGE` | `X4LARGE` | `4X-LARGE` | `X5LARGE` | `5X-LARGE` | `X6LARGE` | `6X-LARGE`. For more information, check [SERVERLESS_TASK_MAX_STATEMENT_SIZE docs](https://docs.snowflake.com/en/sql-reference/parameters#serverless-task-max-statement-size).
+                    type: string
+                  serverlessTaskMinStatementSize:
+                    description: |-
+                      insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MIN_STATEMENT_SIZE docs.
+                      Specifies the minimum warehouse size for serverless tasks. Valid values are (case-insensitive): `XSMALL` | `X-SMALL` | `SMALL` | `MEDIUM` | `LARGE` | `XLARGE` | `X-LARGE` | `XXLARGE` | `X2LARGE` | `2X-LARGE` | `XXXLARGE` | `X3LARGE` | `3X-LARGE` | `X4LARGE` | `4X-LARGE` | `X5LARGE` | `5X-LARGE` | `X6LARGE` | `6X-LARGE`. For more information, check [SERVERLESS_TASK_MIN_STATEMENT_SIZE docs](https://docs.snowflake.com/en/sql-reference/parameters#serverless-task-min-statement-size).
                     type: string
                   sqlStatement:
                     description: |-
@@ -329,6 +349,29 @@ spec:
                       (Number) Specifies the number of consecutive failed task runs after which the current task is suspended automatically. The default is 0 (no automatic suspension). For more information, check SUSPEND_TASK_AFTER_NUM_FAILURES docs.
                       Specifies the number of consecutive failed task runs after which the current task is suspended automatically. The default is 0 (no automatic suspension). For more information, check [SUSPEND_TASK_AFTER_NUM_FAILURES docs](https://docs.snowflake.com/en/sql-reference/parameters#suspend-task-after-num-failures).
                     type: number
+                  targetCompletionInterval:
+                    description: |-
+                      fields hours, minutes, or seconds should be set) (see below for nested schema)
+                      Specifies the target completion interval for tasks. This can be specified in hours, minutes, or seconds. (when set, one of the sub-fields `hours`, `minutes`, or `seconds` should be set)
+                    items:
+                      properties:
+                        hours:
+                          description: |-
+                            (Number) Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, minutes, and using_cron)
+                            Specifies the target completion interval in hours. (conflicts with `minutes` and `seconds`)
+                          type: number
+                        minutes:
+                          description: |-
+                            (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, hours, and using_cron)
+                            Specifies the target completion interval in minutes. (conflicts with `hours` and `seconds`)
+                          type: number
+                        seconds:
+                          description: |-
+                            (Number) Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with minutes, hours, and using_cron)
+                            Specifies the target completion interval in seconds. (conflicts with `hours` and `minutes`)
+                          type: number
+                      type: object
+                    type: array
                   taskAutoRetryAttempts:
                     description: |-
                       (Number) Specifies the number of automatic task graph retry attempts. If any task graphs complete in a FAILED state, Snowflake can automatically retry the task graphs from the last task in the graph that failed. For more information, check TASK_AUTO_RETRY_ATTEMPTS docs.
@@ -663,19 +706,29 @@ spec:
                     type: string
                   schedule:
                     description: |-
-                      fields minutes or using_cron should be set) (see below for nested schema)
-                      The schedule for periodically running the task. This can be a cron or interval in minutes. (Conflicts with finalize and after; when set, one of the sub-fields `minutes` or `using_cron` should be set)
+                      fields seconds, minutes, hours, or using_cron should be set) For Triggered tasks, a schedule is not required. For other tasks, a schedule must be defined for a standalone task or the root task in a task graph; otherwise, the task only runs if manually executed using EXECUTE TASK in, for example, the snowflake_execute resource. A schedule cannot be specified for child tasks in a task graph. For more information on schedule restrictions, consult the official documentation for Task object. (see below for nested schema)
+                      The schedule for periodically running the task. This can be a cron or interval in seconds, minutes, or hours. (Conflicts with finalize and after; when set, one of the sub-fields `seconds`, `minutes`, `hours`, or `using_cron` should be set) For [Triggered tasks](https://docs.snowflake.com/en/user-guide/tasks-triggered), a schedule is not required. For other tasks, a schedule must be defined for a standalone task or the root task in a [task graph](https://docs.snowflake.com/en/user-guide/tasks-graphs#label-task-dag); otherwise, the task only runs if manually executed using [EXECUTE TASK](https://docs.snowflake.com/en/sql-reference/sql/execute-task) in, for example, the [snowflake_execute](https://registry.io/providers/snowflakedb/snowflake/latest/docs/resources/execute) resource. A schedule cannot be specified for child tasks in a task graph. For more information on schedule restrictions, consult the [official documentation for Task object](https://docs.snowflake.com/en/user-guide/tasks-intro).
                     items:
                       properties:
+                        hours:
+                          description: |-
+                            (Number) Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, minutes, and using_cron)
+                            Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with `seconds`, `minutes`, and `using_cron`)
+                          type: number
                         minutes:
                           description: |-
-                            (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers only. (conflicts with using_cron)
-                            Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers only. (conflicts with `using_cron`)
+                            (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, hours, and using_cron)
+                            Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with `seconds`, `hours`, and `using_cron`)
+                          type: number
+                        seconds:
+                          description: |-
+                            (Number) Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with minutes, hours, and using_cron)
+                            Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with `minutes`, `hours`, and `using_cron`)
                           type: number
                         usingCron:
                           description: |-
-                            (String) Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with minutes)
-                            Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with `minutes`)
+                            (String) Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with seconds, minutes, and hours)
+                            Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with `seconds`, `minutes`, and `hours`)
                           type: string
                       type: object
                     type: array
@@ -688,6 +741,16 @@ spec:
                     description: |-
                       separated list of identifiers. An identifier can be a fully or partially qualified schema name. For more information, check SEARCH_PATH docs.
                       Specifies the path to search to resolve unqualified object names in queries. For more information, see [Name resolution in queries](https://docs.snowflake.com/en/sql-reference/name-resolution.html#label-object-name-resolution-search-path). Comma-separated list of identifiers. An identifier can be a fully or partially qualified schema name. For more information, check [SEARCH_PATH docs](https://docs.snowflake.com/en/sql-reference/parameters#search-path).
+                    type: string
+                  serverlessTaskMaxStatementSize:
+                    description: |-
+                      insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MAX_STATEMENT_SIZE docs.
+                      Specifies the maximum warehouse size for serverless tasks. Valid values are (case-insensitive): `XSMALL` | `X-SMALL` | `SMALL` | `MEDIUM` | `LARGE` | `XLARGE` | `X-LARGE` | `XXLARGE` | `X2LARGE` | `2X-LARGE` | `XXXLARGE` | `X3LARGE` | `3X-LARGE` | `X4LARGE` | `4X-LARGE` | `X5LARGE` | `5X-LARGE` | `X6LARGE` | `6X-LARGE`. For more information, check [SERVERLESS_TASK_MAX_STATEMENT_SIZE docs](https://docs.snowflake.com/en/sql-reference/parameters#serverless-task-max-statement-size).
+                    type: string
+                  serverlessTaskMinStatementSize:
+                    description: |-
+                      insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MIN_STATEMENT_SIZE docs.
+                      Specifies the minimum warehouse size for serverless tasks. Valid values are (case-insensitive): `XSMALL` | `X-SMALL` | `SMALL` | `MEDIUM` | `LARGE` | `XLARGE` | `X-LARGE` | `XXLARGE` | `X2LARGE` | `2X-LARGE` | `XXXLARGE` | `X3LARGE` | `3X-LARGE` | `X4LARGE` | `4X-LARGE` | `X5LARGE` | `5X-LARGE` | `X6LARGE` | `6X-LARGE`. For more information, check [SERVERLESS_TASK_MIN_STATEMENT_SIZE docs](https://docs.snowflake.com/en/sql-reference/parameters#serverless-task-min-statement-size).
                     type: string
                   sqlStatement:
                     description: |-
@@ -719,6 +782,29 @@ spec:
                       (Number) Specifies the number of consecutive failed task runs after which the current task is suspended automatically. The default is 0 (no automatic suspension). For more information, check SUSPEND_TASK_AFTER_NUM_FAILURES docs.
                       Specifies the number of consecutive failed task runs after which the current task is suspended automatically. The default is 0 (no automatic suspension). For more information, check [SUSPEND_TASK_AFTER_NUM_FAILURES docs](https://docs.snowflake.com/en/sql-reference/parameters#suspend-task-after-num-failures).
                     type: number
+                  targetCompletionInterval:
+                    description: |-
+                      fields hours, minutes, or seconds should be set) (see below for nested schema)
+                      Specifies the target completion interval for tasks. This can be specified in hours, minutes, or seconds. (when set, one of the sub-fields `hours`, `minutes`, or `seconds` should be set)
+                    items:
+                      properties:
+                        hours:
+                          description: |-
+                            (Number) Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, minutes, and using_cron)
+                            Specifies the target completion interval in hours. (conflicts with `minutes` and `seconds`)
+                          type: number
+                        minutes:
+                          description: |-
+                            (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, hours, and using_cron)
+                            Specifies the target completion interval in minutes. (conflicts with `hours` and `seconds`)
+                          type: number
+                        seconds:
+                          description: |-
+                            (Number) Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with minutes, hours, and using_cron)
+                            Specifies the target completion interval in seconds. (conflicts with `hours` and `minutes`)
+                          type: number
+                      type: object
+                    type: array
                   taskAutoRetryAttempts:
                     description: |-
                       (Number) Specifies the number of automatic task graph retry attempts. If any task graphs complete in a FAILED state, Snowflake can automatically retry the task graphs from the last task in the graph that failed. For more information, check TASK_AUTO_RETRY_ATTEMPTS docs.
@@ -2002,6 +2088,56 @@ spec:
                                 type: string
                             type: object
                           type: array
+                        serverlessTaskMaxStatementSize:
+                          description: 'insensitive): XSMALL | X-SMALL | SMALL | MEDIUM
+                            | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE
+                            | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE |
+                            X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information,
+                            check SERVERLESS_TASK_MAX_STATEMENT_SIZE docs.'
+                          items:
+                            properties:
+                              default:
+                                description: (String)
+                                type: string
+                              description:
+                                description: (String)
+                                type: string
+                              key:
+                                description: (String)
+                                type: string
+                              level:
+                                description: (String)
+                                type: string
+                              value:
+                                description: (String)
+                                type: string
+                            type: object
+                          type: array
+                        serverlessTaskMinStatementSize:
+                          description: 'insensitive): XSMALL | X-SMALL | SMALL | MEDIUM
+                            | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE
+                            | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE |
+                            X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information,
+                            check SERVERLESS_TASK_MIN_STATEMENT_SIZE docs.'
+                          items:
+                            properties:
+                              default:
+                                description: (String)
+                                type: string
+                              description:
+                                description: (String)
+                                type: string
+                              key:
+                                description: (String)
+                                type: string
+                              level:
+                                description: (String)
+                                type: string
+                              value:
+                                description: (String)
+                                type: string
+                            type: object
+                          type: array
                         statementQueuedTimeoutInSeconds:
                           description: (Number) Amount of time, in seconds, a SQL
                             statement (query, DDL, DML, etc.) remains queued for a
@@ -2664,19 +2800,29 @@ spec:
                     type: string
                   schedule:
                     description: |-
-                      fields minutes or using_cron should be set) (see below for nested schema)
-                      The schedule for periodically running the task. This can be a cron or interval in minutes. (Conflicts with finalize and after; when set, one of the sub-fields `minutes` or `using_cron` should be set)
+                      fields seconds, minutes, hours, or using_cron should be set) For Triggered tasks, a schedule is not required. For other tasks, a schedule must be defined for a standalone task or the root task in a task graph; otherwise, the task only runs if manually executed using EXECUTE TASK in, for example, the snowflake_execute resource. A schedule cannot be specified for child tasks in a task graph. For more information on schedule restrictions, consult the official documentation for Task object. (see below for nested schema)
+                      The schedule for periodically running the task. This can be a cron or interval in seconds, minutes, or hours. (Conflicts with finalize and after; when set, one of the sub-fields `seconds`, `minutes`, `hours`, or `using_cron` should be set) For [Triggered tasks](https://docs.snowflake.com/en/user-guide/tasks-triggered), a schedule is not required. For other tasks, a schedule must be defined for a standalone task or the root task in a [task graph](https://docs.snowflake.com/en/user-guide/tasks-graphs#label-task-dag); otherwise, the task only runs if manually executed using [EXECUTE TASK](https://docs.snowflake.com/en/sql-reference/sql/execute-task) in, for example, the [snowflake_execute](https://registry.io/providers/snowflakedb/snowflake/latest/docs/resources/execute) resource. A schedule cannot be specified for child tasks in a task graph. For more information on schedule restrictions, consult the [official documentation for Task object](https://docs.snowflake.com/en/user-guide/tasks-intro).
                     items:
                       properties:
+                        hours:
+                          description: |-
+                            (Number) Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, minutes, and using_cron)
+                            Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with `seconds`, `minutes`, and `using_cron`)
+                          type: number
                         minutes:
                           description: |-
-                            (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers only. (conflicts with using_cron)
-                            Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers only. (conflicts with `using_cron`)
+                            (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, hours, and using_cron)
+                            Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with `seconds`, `hours`, and `using_cron`)
+                          type: number
+                        seconds:
+                          description: |-
+                            (Number) Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with minutes, hours, and using_cron)
+                            Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with `minutes`, `hours`, and `using_cron`)
                           type: number
                         usingCron:
                           description: |-
-                            (String) Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with minutes)
-                            Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with `minutes`)
+                            (String) Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with seconds, minutes, and hours)
+                            Specifies a cron expression and time zone for periodically running the task. Supports a subset of standard cron utility syntax. (conflicts with `seconds`, `minutes`, and `hours`)
                           type: string
                       type: object
                     type: array
@@ -2689,6 +2835,16 @@ spec:
                     description: |-
                       separated list of identifiers. An identifier can be a fully or partially qualified schema name. For more information, check SEARCH_PATH docs.
                       Specifies the path to search to resolve unqualified object names in queries. For more information, see [Name resolution in queries](https://docs.snowflake.com/en/sql-reference/name-resolution.html#label-object-name-resolution-search-path). Comma-separated list of identifiers. An identifier can be a fully or partially qualified schema name. For more information, check [SEARCH_PATH docs](https://docs.snowflake.com/en/sql-reference/parameters#search-path).
+                    type: string
+                  serverlessTaskMaxStatementSize:
+                    description: |-
+                      insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MAX_STATEMENT_SIZE docs.
+                      Specifies the maximum warehouse size for serverless tasks. Valid values are (case-insensitive): `XSMALL` | `X-SMALL` | `SMALL` | `MEDIUM` | `LARGE` | `XLARGE` | `X-LARGE` | `XXLARGE` | `X2LARGE` | `2X-LARGE` | `XXXLARGE` | `X3LARGE` | `3X-LARGE` | `X4LARGE` | `4X-LARGE` | `X5LARGE` | `5X-LARGE` | `X6LARGE` | `6X-LARGE`. For more information, check [SERVERLESS_TASK_MAX_STATEMENT_SIZE docs](https://docs.snowflake.com/en/sql-reference/parameters#serverless-task-max-statement-size).
+                    type: string
+                  serverlessTaskMinStatementSize:
+                    description: |-
+                      insensitive): XSMALL | X-SMALL | SMALL | MEDIUM | LARGE | XLARGE | X-LARGE | XXLARGE | X2LARGE | 2X-LARGE | XXXLARGE | X3LARGE | 3X-LARGE | X4LARGE | 4X-LARGE | X5LARGE | 5X-LARGE | X6LARGE | 6X-LARGE. For more information, check SERVERLESS_TASK_MIN_STATEMENT_SIZE docs.
+                      Specifies the minimum warehouse size for serverless tasks. Valid values are (case-insensitive): `XSMALL` | `X-SMALL` | `SMALL` | `MEDIUM` | `LARGE` | `XLARGE` | `X-LARGE` | `XXLARGE` | `X2LARGE` | `2X-LARGE` | `XXXLARGE` | `X3LARGE` | `3X-LARGE` | `X4LARGE` | `4X-LARGE` | `X5LARGE` | `5X-LARGE` | `X6LARGE` | `6X-LARGE`. For more information, check [SERVERLESS_TASK_MIN_STATEMENT_SIZE docs](https://docs.snowflake.com/en/sql-reference/parameters#serverless-task-min-statement-size).
                     type: string
                   showOutput:
                     description: |-
@@ -2768,8 +2924,16 @@ spec:
                           type: array
                           x-kubernetes-list-type: set
                         schedule:
-                          description: fields minutes or using_cron should be set)
-                            (see below for nested schema)
+                          description: fields seconds, minutes, hours, or using_cron
+                            should be set) For Triggered tasks, a schedule is not
+                            required. For other tasks, a schedule must be defined
+                            for a standalone task or the root task in a task graph;
+                            otherwise, the task only runs if manually executed using
+                            EXECUTE TASK in, for example, the snowflake_execute resource.
+                            A schedule cannot be specified for child tasks in a task
+                            graph. For more information on schedule restrictions,
+                            consult the official documentation for Task object. (see
+                            below for nested schema)
                           type: string
                         schemaName:
                           description: (String)
@@ -2777,6 +2941,31 @@ spec:
                         state:
                           description: (String)
                           type: string
+                        targetCompletionInterval:
+                          description: fields hours, minutes, or seconds should be
+                            set) (see below for nested schema)
+                          items:
+                            properties:
+                              hours:
+                                description: (Number) Specifies an interval (in hours)
+                                  of wait time inserted between runs of the task.
+                                  Accepts positive integers. (conflicts with seconds,
+                                  minutes, and using_cron)
+                                type: number
+                              minutes:
+                                description: (Number) Specifies an interval (in minutes)
+                                  of wait time inserted between runs of the task.
+                                  Accepts positive integers. (conflicts with seconds,
+                                  hours, and using_cron)
+                                type: number
+                              seconds:
+                                description: (Number) Specifies an interval (in seconds)
+                                  of wait time inserted between runs of the task.
+                                  Accepts positive integers. (conflicts with minutes,
+                                  hours, and using_cron)
+                                type: number
+                            type: object
+                          type: array
                         taskRelations:
                           description: (List of Object) (see below for nested schema)
                           items:
@@ -2833,6 +3022,29 @@ spec:
                       (Number) Specifies the number of consecutive failed task runs after which the current task is suspended automatically. The default is 0 (no automatic suspension). For more information, check SUSPEND_TASK_AFTER_NUM_FAILURES docs.
                       Specifies the number of consecutive failed task runs after which the current task is suspended automatically. The default is 0 (no automatic suspension). For more information, check [SUSPEND_TASK_AFTER_NUM_FAILURES docs](https://docs.snowflake.com/en/sql-reference/parameters#suspend-task-after-num-failures).
                     type: number
+                  targetCompletionInterval:
+                    description: |-
+                      fields hours, minutes, or seconds should be set) (see below for nested schema)
+                      Specifies the target completion interval for tasks. This can be specified in hours, minutes, or seconds. (when set, one of the sub-fields `hours`, `minutes`, or `seconds` should be set)
+                    items:
+                      properties:
+                        hours:
+                          description: |-
+                            (Number) Specifies an interval (in hours) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, minutes, and using_cron)
+                            Specifies the target completion interval in hours. (conflicts with `minutes` and `seconds`)
+                          type: number
+                        minutes:
+                          description: |-
+                            (Number) Specifies an interval (in minutes) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with seconds, hours, and using_cron)
+                            Specifies the target completion interval in minutes. (conflicts with `hours` and `seconds`)
+                          type: number
+                        seconds:
+                          description: |-
+                            (Number) Specifies an interval (in seconds) of wait time inserted between runs of the task. Accepts positive integers. (conflicts with minutes, hours, and using_cron)
+                            Specifies the target completion interval in seconds. (conflicts with `hours` and `minutes`)
+                          type: number
+                      type: object
+                    type: array
                   taskAutoRetryAttempts:
                     description: |-
                       (Number) Specifies the number of automatic task graph retry attempts. If any task graphs complete in a FAILED state, Snowflake can automatically retry the task graphs from the last task in the graph that failed. For more information, check TASK_AUTO_RETRY_ATTEMPTS docs.

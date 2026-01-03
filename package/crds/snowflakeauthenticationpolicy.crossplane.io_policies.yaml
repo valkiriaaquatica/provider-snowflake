@@ -76,16 +76,16 @@ spec:
                 properties:
                   authenticationMethods:
                     description: |-
-                      (Set of String) A list of authentication methods that are allowed during login. This parameter accepts one or more of the following values: ALL | SAML | PASSWORD | OAUTH | KEYPAIR
-                      A list of authentication methods that are allowed during login. This parameter accepts one or more of the following values: `ALL` | `SAML` | `PASSWORD` | `OAUTH` | `KEYPAIR`
+                      insensitive): ALL | SAML | PASSWORD | OAUTH | KEYPAIR | PROGRAMMATIC_ACCESS_TOKEN | WORKLOAD_IDENTITY.
+                      A list of authentication methods that are allowed during login. Valid values are (case-insensitive): `ALL` | `SAML` | `PASSWORD` | `OAUTH` | `KEYPAIR` | `PROGRAMMATIC_ACCESS_TOKEN` | `WORKLOAD_IDENTITY`.
                     items:
                       type: string
                     type: array
                     x-kubernetes-list-type: set
                   clientTypes:
                     description: |-
-                      (Set of String) A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid CLIENT_TYPES, then the login attempt fails. Allowed values are ALL | SNOWFLAKE_UI | DRIVERS | SNOWSQL. The CLIENT_TYPES property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
-                      A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid CLIENT_TYPES, then the login attempt fails. Allowed values are `ALL` | `SNOWFLAKE_UI` | `DRIVERS` | `SNOWSQL`. The CLIENT_TYPES property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
+                      insensitive): ALL | SNOWFLAKE_UI | DRIVERS | SNOWSQL | SNOWFLAKE_CLI. The client_types property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
+                      A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid `client_types`, then the login attempt fails. Valid values are (case-insensitive): `ALL` | `SNOWFLAKE_UI` | `DRIVERS` | `SNOWSQL` | `SNOWFLAKE_CLI`. The `client_types` property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
                     items:
                       type: string
                     type: array
@@ -110,14 +110,58 @@ spec:
                     x-kubernetes-list-type: set
                   mfaEnrollment:
                     description: |-
-                      factor authentication. Allowed values are REQUIRED and OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the CLIENT_TYPES parameter must include SNOWFLAKE_UI, because Snowsight is the only place users can enroll in multi-factor authentication (MFA).
-                      (Default: `OPTIONAL`) Determines whether a user must enroll in multi-factor authentication. Allowed values are REQUIRED and OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the CLIENT_TYPES parameter must include SNOWFLAKE_UI, because Snowsight is the only place users can enroll in multi-factor authentication (MFA).
+                      factor authentication. Valid values are (case-insensitive): REQUIRED | REQUIRED_PASSWORD_ONLY | OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the client_types parameter must include snowflake_ui, because Snowsight is the only place users can enroll in multi-factor authentication (MFA). Note that when you set this value to OPTIONAL, and your account setup forces users to enroll in MFA, then Snowflake may set quietly this value to REQUIRED_PASSWORD_ONLY, which may cause permadiff. In this case, you may want to adjust this field value.
+                      Determines whether a user must enroll in multi-factor authentication. Valid values are (case-insensitive): `REQUIRED` | `REQUIRED_PASSWORD_ONLY` | `OPTIONAL`. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the `client_types` parameter must include `snowflake_ui`, because Snowsight is the only place users can enroll in multi-factor authentication (MFA). Note that when you set this value to OPTIONAL, and your account setup forces users to enroll in MFA, then Snowflake may set quietly this value to `REQUIRED_PASSWORD_ONLY`, which may cause permadiff. In this case, you may want to adjust this field value.
                     type: string
+                  mfaPolicy:
+                    description: |-
+                      factor authentication (MFA) methods that users can use as a second factor of authentication. (see below for nested schema)
+                      Specifies the multi-factor authentication (MFA) methods that users can use as a second factor of authentication.
+                    items:
+                      properties:
+                        allowedMethods:
+                          description: |-
+                            Prefer using uppercased values.
+                            Specifies the allowed methods for the MFA policy. Valid values are: `ALL` | `PASSKEY` | `TOTP` | `DUO`. Prefer using uppercased values.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: set
+                        enforceMfaOnExternalAuthentication:
+                          description: |-
+                            factor authentication (MFA) is enforced on external authentication. Valid values are (case-insensitive): ALL | NONE.
+                            Determines whether multi-factor authentication (MFA) is enforced on external authentication. Valid values are (case-insensitive): `ALL` | `NONE`.
+                          type: string
+                      type: object
+                    type: array
                   name:
                     description: |-
                       (String) Specifies the identifier for the authentication policy. Due to technical limitations (read more here), avoid using the following characters: |, ., ".
                       Specifies the identifier for the authentication policy. Due to technical limitations (read more [here](../guides/identifiers_rework_design_decisions#known-limitations-and-identifier-recommendations)), avoid using the following characters: `|`, `.`, `"`.
                     type: string
+                  patPolicy:
+                    description: |-
+                      (Block List, Max: 1) Specifies the policy for programmatic access tokens. (see below for nested schema)
+                      Specifies the policy for programmatic access tokens.
+                    items:
+                      properties:
+                        defaultExpiryInDays:
+                          description: |-
+                            (Number) Specifies the default expiration time (in days) for a programmatic access token.
+                            Specifies the default expiration time (in days) for a programmatic access token.
+                          type: number
+                        maxExpiryInDays:
+                          description: |-
+                            (Number) Specifies the maximum number of days that can be set for the expiration time for a programmatic access token.
+                            Specifies the maximum number of days that can be set for the expiration time for a programmatic access token.
+                          type: number
+                        networkPolicyEvaluation:
+                          description: |-
+                            (String) Specifies the network policy evaluation for the PAT.
+                            Specifies the network policy evaluation for the PAT.
+                          type: string
+                      type: object
+                    type: array
                   schema:
                     description: |-
                       (String) The schema in which to create the authentication policy. Due to technical limitations (read more here), avoid using the following characters: |, ., ".
@@ -125,12 +169,52 @@ spec:
                     type: string
                   securityIntegrations:
                     description: |-
-                      (Set of String) A list of security integrations the authentication policy is associated with. This parameter has no effect when SAML or OAUTH are not in the AUTHENTICATION_METHODS list. All values in the SECURITY_INTEGRATIONS list must be compatible with the values in the AUTHENTICATION_METHODS list. For example, if SECURITY_INTEGRATIONS contains a SAML security integration, and AUTHENTICATION_METHODS contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
-                      A list of security integrations the authentication policy is associated with. This parameter has no effect when SAML or OAUTH are not in the AUTHENTICATION_METHODS list. All values in the SECURITY_INTEGRATIONS list must be compatible with the values in the AUTHENTICATION_METHODS list. For example, if SECURITY_INTEGRATIONS contains a SAML security integration, and AUTHENTICATION_METHODS contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
+                      (Set of String) A list of security integrations the authentication policy is associated with. This parameter has no effect when saml or oauth are not in the authentication_methods list. All values in the security_integrations list must be compatible with the values in the authentication_methods list. For example, if security_integrations contains a SAML security integration, and authentication_methods contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
+                      A list of security integrations the authentication policy is associated with. This parameter has no effect when `saml` or `oauth` are not in the `authentication_methods` list. All values in the `security_integrations` list must be compatible with the values in the `authentication_methods` list. For example, if `security_integrations` contains a SAML security integration, and `authentication_methods` contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use `ALL` as parameter.
                     items:
                       type: string
                     type: array
                     x-kubernetes-list-type: set
+                  workloadIdentityPolicy:
+                    description: |-
+                      (Block List, Max: 1) Specifies the policy for workload identity federation. (see below for nested schema)
+                      Specifies the policy for workload identity federation.
+                    items:
+                      properties:
+                        allowedAwsAccounts:
+                          description: |-
+                            (Set of String) Specifies the list of AWS account IDs allowed by the authentication policy during workload identity authentication of type AWS.
+                            Specifies the list of AWS account IDs allowed by the authentication policy during workload identity authentication of type `AWS`.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: set
+                        allowedAzureIssuers:
+                          description: |-
+                            (Set of String) Specifies the list of Azure Entra ID issuers allowed by the authentication policy during workload identity authentication of type AZURE.
+                            Specifies the list of Azure Entra ID issuers allowed by the authentication policy during workload identity authentication of type `AZURE`.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: set
+                        allowedOidcIssuers:
+                          description: |-
+                            (Set of String) Specifies the list of OIDC issuers allowed by the authentication policy during workload identity authentication of type OIDC.
+                            Specifies the list of OIDC issuers allowed by the authentication policy during workload identity authentication of type `OIDC`.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: set
+                        allowedProviders:
+                          description: |-
+                            Prefer using uppercased values.
+                            Specifies the allowed providers for the workload identity policy. Valid values are: `ALL` | `AWS` | `AZURE` | `GCP` | `OIDC`. Prefer using uppercased values.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: set
+                      type: object
+                    type: array
                 type: object
               initProvider:
                 description: |-
@@ -147,16 +231,16 @@ spec:
                 properties:
                   authenticationMethods:
                     description: |-
-                      (Set of String) A list of authentication methods that are allowed during login. This parameter accepts one or more of the following values: ALL | SAML | PASSWORD | OAUTH | KEYPAIR
-                      A list of authentication methods that are allowed during login. This parameter accepts one or more of the following values: `ALL` | `SAML` | `PASSWORD` | `OAUTH` | `KEYPAIR`
+                      insensitive): ALL | SAML | PASSWORD | OAUTH | KEYPAIR | PROGRAMMATIC_ACCESS_TOKEN | WORKLOAD_IDENTITY.
+                      A list of authentication methods that are allowed during login. Valid values are (case-insensitive): `ALL` | `SAML` | `PASSWORD` | `OAUTH` | `KEYPAIR` | `PROGRAMMATIC_ACCESS_TOKEN` | `WORKLOAD_IDENTITY`.
                     items:
                       type: string
                     type: array
                     x-kubernetes-list-type: set
                   clientTypes:
                     description: |-
-                      (Set of String) A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid CLIENT_TYPES, then the login attempt fails. Allowed values are ALL | SNOWFLAKE_UI | DRIVERS | SNOWSQL. The CLIENT_TYPES property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
-                      A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid CLIENT_TYPES, then the login attempt fails. Allowed values are `ALL` | `SNOWFLAKE_UI` | `DRIVERS` | `SNOWSQL`. The CLIENT_TYPES property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
+                      insensitive): ALL | SNOWFLAKE_UI | DRIVERS | SNOWSQL | SNOWFLAKE_CLI. The client_types property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
+                      A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid `client_types`, then the login attempt fails. Valid values are (case-insensitive): `ALL` | `SNOWFLAKE_UI` | `DRIVERS` | `SNOWSQL` | `SNOWFLAKE_CLI`. The `client_types` property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
                     items:
                       type: string
                     type: array
@@ -181,14 +265,58 @@ spec:
                     x-kubernetes-list-type: set
                   mfaEnrollment:
                     description: |-
-                      factor authentication. Allowed values are REQUIRED and OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the CLIENT_TYPES parameter must include SNOWFLAKE_UI, because Snowsight is the only place users can enroll in multi-factor authentication (MFA).
-                      (Default: `OPTIONAL`) Determines whether a user must enroll in multi-factor authentication. Allowed values are REQUIRED and OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the CLIENT_TYPES parameter must include SNOWFLAKE_UI, because Snowsight is the only place users can enroll in multi-factor authentication (MFA).
+                      factor authentication. Valid values are (case-insensitive): REQUIRED | REQUIRED_PASSWORD_ONLY | OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the client_types parameter must include snowflake_ui, because Snowsight is the only place users can enroll in multi-factor authentication (MFA). Note that when you set this value to OPTIONAL, and your account setup forces users to enroll in MFA, then Snowflake may set quietly this value to REQUIRED_PASSWORD_ONLY, which may cause permadiff. In this case, you may want to adjust this field value.
+                      Determines whether a user must enroll in multi-factor authentication. Valid values are (case-insensitive): `REQUIRED` | `REQUIRED_PASSWORD_ONLY` | `OPTIONAL`. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the `client_types` parameter must include `snowflake_ui`, because Snowsight is the only place users can enroll in multi-factor authentication (MFA). Note that when you set this value to OPTIONAL, and your account setup forces users to enroll in MFA, then Snowflake may set quietly this value to `REQUIRED_PASSWORD_ONLY`, which may cause permadiff. In this case, you may want to adjust this field value.
                     type: string
+                  mfaPolicy:
+                    description: |-
+                      factor authentication (MFA) methods that users can use as a second factor of authentication. (see below for nested schema)
+                      Specifies the multi-factor authentication (MFA) methods that users can use as a second factor of authentication.
+                    items:
+                      properties:
+                        allowedMethods:
+                          description: |-
+                            Prefer using uppercased values.
+                            Specifies the allowed methods for the MFA policy. Valid values are: `ALL` | `PASSKEY` | `TOTP` | `DUO`. Prefer using uppercased values.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: set
+                        enforceMfaOnExternalAuthentication:
+                          description: |-
+                            factor authentication (MFA) is enforced on external authentication. Valid values are (case-insensitive): ALL | NONE.
+                            Determines whether multi-factor authentication (MFA) is enforced on external authentication. Valid values are (case-insensitive): `ALL` | `NONE`.
+                          type: string
+                      type: object
+                    type: array
                   name:
                     description: |-
                       (String) Specifies the identifier for the authentication policy. Due to technical limitations (read more here), avoid using the following characters: |, ., ".
                       Specifies the identifier for the authentication policy. Due to technical limitations (read more [here](../guides/identifiers_rework_design_decisions#known-limitations-and-identifier-recommendations)), avoid using the following characters: `|`, `.`, `"`.
                     type: string
+                  patPolicy:
+                    description: |-
+                      (Block List, Max: 1) Specifies the policy for programmatic access tokens. (see below for nested schema)
+                      Specifies the policy for programmatic access tokens.
+                    items:
+                      properties:
+                        defaultExpiryInDays:
+                          description: |-
+                            (Number) Specifies the default expiration time (in days) for a programmatic access token.
+                            Specifies the default expiration time (in days) for a programmatic access token.
+                          type: number
+                        maxExpiryInDays:
+                          description: |-
+                            (Number) Specifies the maximum number of days that can be set for the expiration time for a programmatic access token.
+                            Specifies the maximum number of days that can be set for the expiration time for a programmatic access token.
+                          type: number
+                        networkPolicyEvaluation:
+                          description: |-
+                            (String) Specifies the network policy evaluation for the PAT.
+                            Specifies the network policy evaluation for the PAT.
+                          type: string
+                      type: object
+                    type: array
                   schema:
                     description: |-
                       (String) The schema in which to create the authentication policy. Due to technical limitations (read more here), avoid using the following characters: |, ., ".
@@ -196,12 +324,52 @@ spec:
                     type: string
                   securityIntegrations:
                     description: |-
-                      (Set of String) A list of security integrations the authentication policy is associated with. This parameter has no effect when SAML or OAUTH are not in the AUTHENTICATION_METHODS list. All values in the SECURITY_INTEGRATIONS list must be compatible with the values in the AUTHENTICATION_METHODS list. For example, if SECURITY_INTEGRATIONS contains a SAML security integration, and AUTHENTICATION_METHODS contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
-                      A list of security integrations the authentication policy is associated with. This parameter has no effect when SAML or OAUTH are not in the AUTHENTICATION_METHODS list. All values in the SECURITY_INTEGRATIONS list must be compatible with the values in the AUTHENTICATION_METHODS list. For example, if SECURITY_INTEGRATIONS contains a SAML security integration, and AUTHENTICATION_METHODS contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
+                      (Set of String) A list of security integrations the authentication policy is associated with. This parameter has no effect when saml or oauth are not in the authentication_methods list. All values in the security_integrations list must be compatible with the values in the authentication_methods list. For example, if security_integrations contains a SAML security integration, and authentication_methods contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
+                      A list of security integrations the authentication policy is associated with. This parameter has no effect when `saml` or `oauth` are not in the `authentication_methods` list. All values in the `security_integrations` list must be compatible with the values in the `authentication_methods` list. For example, if `security_integrations` contains a SAML security integration, and `authentication_methods` contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use `ALL` as parameter.
                     items:
                       type: string
                     type: array
                     x-kubernetes-list-type: set
+                  workloadIdentityPolicy:
+                    description: |-
+                      (Block List, Max: 1) Specifies the policy for workload identity federation. (see below for nested schema)
+                      Specifies the policy for workload identity federation.
+                    items:
+                      properties:
+                        allowedAwsAccounts:
+                          description: |-
+                            (Set of String) Specifies the list of AWS account IDs allowed by the authentication policy during workload identity authentication of type AWS.
+                            Specifies the list of AWS account IDs allowed by the authentication policy during workload identity authentication of type `AWS`.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: set
+                        allowedAzureIssuers:
+                          description: |-
+                            (Set of String) Specifies the list of Azure Entra ID issuers allowed by the authentication policy during workload identity authentication of type AZURE.
+                            Specifies the list of Azure Entra ID issuers allowed by the authentication policy during workload identity authentication of type `AZURE`.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: set
+                        allowedOidcIssuers:
+                          description: |-
+                            (Set of String) Specifies the list of OIDC issuers allowed by the authentication policy during workload identity authentication of type OIDC.
+                            Specifies the list of OIDC issuers allowed by the authentication policy during workload identity authentication of type `OIDC`.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: set
+                        allowedProviders:
+                          description: |-
+                            Prefer using uppercased values.
+                            Specifies the allowed providers for the workload identity policy. Valid values are: `ALL` | `AWS` | `AZURE` | `GCP` | `OIDC`. Prefer using uppercased values.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: set
+                      type: object
+                    type: array
                 type: object
               managementPolicies:
                 default:
@@ -390,16 +558,16 @@ spec:
                 properties:
                   authenticationMethods:
                     description: |-
-                      (Set of String) A list of authentication methods that are allowed during login. This parameter accepts one or more of the following values: ALL | SAML | PASSWORD | OAUTH | KEYPAIR
-                      A list of authentication methods that are allowed during login. This parameter accepts one or more of the following values: `ALL` | `SAML` | `PASSWORD` | `OAUTH` | `KEYPAIR`
+                      insensitive): ALL | SAML | PASSWORD | OAUTH | KEYPAIR | PROGRAMMATIC_ACCESS_TOKEN | WORKLOAD_IDENTITY.
+                      A list of authentication methods that are allowed during login. Valid values are (case-insensitive): `ALL` | `SAML` | `PASSWORD` | `OAUTH` | `KEYPAIR` | `PROGRAMMATIC_ACCESS_TOKEN` | `WORKLOAD_IDENTITY`.
                     items:
                       type: string
                     type: array
                     x-kubernetes-list-type: set
                   clientTypes:
                     description: |-
-                      (Set of String) A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid CLIENT_TYPES, then the login attempt fails. Allowed values are ALL | SNOWFLAKE_UI | DRIVERS | SNOWSQL. The CLIENT_TYPES property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
-                      A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid CLIENT_TYPES, then the login attempt fails. Allowed values are `ALL` | `SNOWFLAKE_UI` | `DRIVERS` | `SNOWSQL`. The CLIENT_TYPES property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
+                      insensitive): ALL | SNOWFLAKE_UI | DRIVERS | SNOWSQL | SNOWFLAKE_CLI. The client_types property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
+                      A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid `client_types`, then the login attempt fails. Valid values are (case-insensitive): `ALL` | `SNOWFLAKE_UI` | `DRIVERS` | `SNOWSQL` | `SNOWFLAKE_CLI`. The `client_types` property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
                     items:
                       type: string
                     type: array
@@ -421,20 +589,15 @@ spec:
                     items:
                       properties:
                         authenticationMethods:
-                          description: '(Set of String) A list of authentication methods
-                            that are allowed during login. This parameter accepts
-                            one or more of the following values: ALL | SAML | PASSWORD
-                            | OAUTH | KEYPAIR'
+                          description: 'insensitive): ALL | SAML | PASSWORD | OAUTH
+                            | KEYPAIR | PROGRAMMATIC_ACCESS_TOKEN | WORKLOAD_IDENTITY.'
                           type: string
                         clientTypes:
-                          description: (Set of String) A list of clients that can
-                            authenticate with Snowflake. If a client tries to connect,
-                            and the client is not one of the valid CLIENT_TYPES, then
-                            the login attempt fails. Allowed values are ALL | SNOWFLAKE_UI
-                            | DRIVERS | SNOWSQL. The CLIENT_TYPES property of an authentication
-                            policy is a best effort method to block user logins based
-                            on specific clients. It should not be used as the sole
-                            control to establish a security boundary.
+                          description: 'insensitive): ALL | SNOWFLAKE_UI | DRIVERS
+                            | SNOWSQL | SNOWFLAKE_CLI. The client_types property of
+                            an authentication policy is a best effort method to block
+                            user logins based on specific clients. It should not be
+                            used as the sole control to establish a security boundary.'
                           type: string
                         comment:
                           description: (String) Specifies a comment for the authentication
@@ -447,12 +610,22 @@ spec:
                             SAML | PASSWORD.
                           type: string
                         mfaEnrollment:
-                          description: factor authentication. Allowed values are REQUIRED
-                            and OPTIONAL. When REQUIRED is specified, Enforces users
-                            to enroll in MFA. If this value is used, then the CLIENT_TYPES
-                            parameter must include SNOWFLAKE_UI, because Snowsight
-                            is the only place users can enroll in multi-factor authentication
-                            (MFA).
+                          description: 'factor authentication. Valid values are (case-insensitive):
+                            REQUIRED | REQUIRED_PASSWORD_ONLY | OPTIONAL. When REQUIRED
+                            is specified, Enforces users to enroll in MFA. If this
+                            value is used, then the client_types parameter must include
+                            snowflake_ui, because Snowsight is the only place users
+                            can enroll in multi-factor authentication (MFA). Note
+                            that when you set this value to OPTIONAL, and your account
+                            setup forces users to enroll in MFA, then Snowflake may
+                            set quietly this value to REQUIRED_PASSWORD_ONLY, which
+                            may cause permadiff. In this case, you may want to adjust
+                            this field value.'
+                          type: string
+                        mfaPolicy:
+                          description: factor authentication (MFA) methods that users
+                            can use as a second factor of authentication. (see below
+                            for nested schema)
                           type: string
                         name:
                           description: '(String) Specifies the identifier for the
@@ -463,17 +636,27 @@ spec:
                         owner:
                           description: (String)
                           type: string
+                        patPolicy:
+                          description: '(Block List, Max: 1) Specifies the policy
+                            for programmatic access tokens. (see below for nested
+                            schema)'
+                          type: string
                         securityIntegrations:
                           description: (Set of String) A list of security integrations
                             the authentication policy is associated with. This parameter
-                            has no effect when SAML or OAUTH are not in the AUTHENTICATION_METHODS
-                            list. All values in the SECURITY_INTEGRATIONS list must
-                            be compatible with the values in the AUTHENTICATION_METHODS
-                            list. For example, if SECURITY_INTEGRATIONS contains a
-                            SAML security integration, and AUTHENTICATION_METHODS
+                            has no effect when saml or oauth are not in the authentication_methods
+                            list. All values in the security_integrations list must
+                            be compatible with the values in the authentication_methods
+                            list. For example, if security_integrations contains a
+                            SAML security integration, and authentication_methods
                             contains OAUTH, then you cannot create the authentication
                             policy. To allow all security integrations use ALL as
                             parameter.
+                          type: string
+                        workloadIdentityPolicy:
+                          description: '(Block List, Max: 1) Specifies the policy
+                            for workload identity federation. (see below for nested
+                            schema)'
                           type: string
                       type: object
                     type: array
@@ -495,14 +678,58 @@ spec:
                     x-kubernetes-list-type: set
                   mfaEnrollment:
                     description: |-
-                      factor authentication. Allowed values are REQUIRED and OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the CLIENT_TYPES parameter must include SNOWFLAKE_UI, because Snowsight is the only place users can enroll in multi-factor authentication (MFA).
-                      (Default: `OPTIONAL`) Determines whether a user must enroll in multi-factor authentication. Allowed values are REQUIRED and OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the CLIENT_TYPES parameter must include SNOWFLAKE_UI, because Snowsight is the only place users can enroll in multi-factor authentication (MFA).
+                      factor authentication. Valid values are (case-insensitive): REQUIRED | REQUIRED_PASSWORD_ONLY | OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the client_types parameter must include snowflake_ui, because Snowsight is the only place users can enroll in multi-factor authentication (MFA). Note that when you set this value to OPTIONAL, and your account setup forces users to enroll in MFA, then Snowflake may set quietly this value to REQUIRED_PASSWORD_ONLY, which may cause permadiff. In this case, you may want to adjust this field value.
+                      Determines whether a user must enroll in multi-factor authentication. Valid values are (case-insensitive): `REQUIRED` | `REQUIRED_PASSWORD_ONLY` | `OPTIONAL`. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the `client_types` parameter must include `snowflake_ui`, because Snowsight is the only place users can enroll in multi-factor authentication (MFA). Note that when you set this value to OPTIONAL, and your account setup forces users to enroll in MFA, then Snowflake may set quietly this value to `REQUIRED_PASSWORD_ONLY`, which may cause permadiff. In this case, you may want to adjust this field value.
                     type: string
+                  mfaPolicy:
+                    description: |-
+                      factor authentication (MFA) methods that users can use as a second factor of authentication. (see below for nested schema)
+                      Specifies the multi-factor authentication (MFA) methods that users can use as a second factor of authentication.
+                    items:
+                      properties:
+                        allowedMethods:
+                          description: |-
+                            Prefer using uppercased values.
+                            Specifies the allowed methods for the MFA policy. Valid values are: `ALL` | `PASSKEY` | `TOTP` | `DUO`. Prefer using uppercased values.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: set
+                        enforceMfaOnExternalAuthentication:
+                          description: |-
+                            factor authentication (MFA) is enforced on external authentication. Valid values are (case-insensitive): ALL | NONE.
+                            Determines whether multi-factor authentication (MFA) is enforced on external authentication. Valid values are (case-insensitive): `ALL` | `NONE`.
+                          type: string
+                      type: object
+                    type: array
                   name:
                     description: |-
                       (String) Specifies the identifier for the authentication policy. Due to technical limitations (read more here), avoid using the following characters: |, ., ".
                       Specifies the identifier for the authentication policy. Due to technical limitations (read more [here](../guides/identifiers_rework_design_decisions#known-limitations-and-identifier-recommendations)), avoid using the following characters: `|`, `.`, `"`.
                     type: string
+                  patPolicy:
+                    description: |-
+                      (Block List, Max: 1) Specifies the policy for programmatic access tokens. (see below for nested schema)
+                      Specifies the policy for programmatic access tokens.
+                    items:
+                      properties:
+                        defaultExpiryInDays:
+                          description: |-
+                            (Number) Specifies the default expiration time (in days) for a programmatic access token.
+                            Specifies the default expiration time (in days) for a programmatic access token.
+                          type: number
+                        maxExpiryInDays:
+                          description: |-
+                            (Number) Specifies the maximum number of days that can be set for the expiration time for a programmatic access token.
+                            Specifies the maximum number of days that can be set for the expiration time for a programmatic access token.
+                          type: number
+                        networkPolicyEvaluation:
+                          description: |-
+                            (String) Specifies the network policy evaluation for the PAT.
+                            Specifies the network policy evaluation for the PAT.
+                          type: string
+                      type: object
+                    type: array
                   schema:
                     description: |-
                       (String) The schema in which to create the authentication policy. Due to technical limitations (read more here), avoid using the following characters: |, ., ".
@@ -510,8 +737,8 @@ spec:
                     type: string
                   securityIntegrations:
                     description: |-
-                      (Set of String) A list of security integrations the authentication policy is associated with. This parameter has no effect when SAML or OAUTH are not in the AUTHENTICATION_METHODS list. All values in the SECURITY_INTEGRATIONS list must be compatible with the values in the AUTHENTICATION_METHODS list. For example, if SECURITY_INTEGRATIONS contains a SAML security integration, and AUTHENTICATION_METHODS contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
-                      A list of security integrations the authentication policy is associated with. This parameter has no effect when SAML or OAUTH are not in the AUTHENTICATION_METHODS list. All values in the SECURITY_INTEGRATIONS list must be compatible with the values in the AUTHENTICATION_METHODS list. For example, if SECURITY_INTEGRATIONS contains a SAML security integration, and AUTHENTICATION_METHODS contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
+                      (Set of String) A list of security integrations the authentication policy is associated with. This parameter has no effect when saml or oauth are not in the authentication_methods list. All values in the security_integrations list must be compatible with the values in the authentication_methods list. For example, if security_integrations contains a SAML security integration, and authentication_methods contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
+                      A list of security integrations the authentication policy is associated with. This parameter has no effect when `saml` or `oauth` are not in the `authentication_methods` list. All values in the `security_integrations` list must be compatible with the values in the `authentication_methods` list. For example, if `security_integrations` contains a SAML security integration, and `authentication_methods` contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use `ALL` as parameter.
                     items:
                       type: string
                     type: array
@@ -532,6 +759,9 @@ spec:
                         databaseName:
                           description: (String)
                           type: string
+                        kind:
+                          description: (String)
+                          type: string
                         name:
                           description: '(String) Specifies the identifier for the
                             authentication policy. Due to technical limitations (read
@@ -550,6 +780,46 @@ spec:
                         schemaName:
                           description: (String)
                           type: string
+                      type: object
+                    type: array
+                  workloadIdentityPolicy:
+                    description: |-
+                      (Block List, Max: 1) Specifies the policy for workload identity federation. (see below for nested schema)
+                      Specifies the policy for workload identity federation.
+                    items:
+                      properties:
+                        allowedAwsAccounts:
+                          description: |-
+                            (Set of String) Specifies the list of AWS account IDs allowed by the authentication policy during workload identity authentication of type AWS.
+                            Specifies the list of AWS account IDs allowed by the authentication policy during workload identity authentication of type `AWS`.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: set
+                        allowedAzureIssuers:
+                          description: |-
+                            (Set of String) Specifies the list of Azure Entra ID issuers allowed by the authentication policy during workload identity authentication of type AZURE.
+                            Specifies the list of Azure Entra ID issuers allowed by the authentication policy during workload identity authentication of type `AZURE`.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: set
+                        allowedOidcIssuers:
+                          description: |-
+                            (Set of String) Specifies the list of OIDC issuers allowed by the authentication policy during workload identity authentication of type OIDC.
+                            Specifies the list of OIDC issuers allowed by the authentication policy during workload identity authentication of type `OIDC`.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: set
+                        allowedProviders:
+                          description: |-
+                            Prefer using uppercased values.
+                            Specifies the allowed providers for the workload identity policy. Valid values are: `ALL` | `AWS` | `AZURE` | `GCP` | `OIDC`. Prefer using uppercased values.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: set
                       type: object
                     type: array
                 type: object

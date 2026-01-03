@@ -18,10 +18,10 @@ type DescribeOutputInitParameters struct {
 
 type DescribeOutputObservation struct {
 
-	// (Set of String) A list of authentication methods that are allowed during login. This parameter accepts one or more of the following values: ALL | SAML | PASSWORD | OAUTH | KEYPAIR
+	// insensitive): ALL | SAML | PASSWORD | OAUTH | KEYPAIR | PROGRAMMATIC_ACCESS_TOKEN | WORKLOAD_IDENTITY.
 	AuthenticationMethods *string `json:"authenticationMethods,omitempty" tf:"authentication_methods,omitempty"`
 
-	// (Set of String) A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid CLIENT_TYPES, then the login attempt fails. Allowed values are ALL | SNOWFLAKE_UI | DRIVERS | SNOWSQL. The CLIENT_TYPES property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
+	// insensitive): ALL | SNOWFLAKE_UI | DRIVERS | SNOWSQL | SNOWFLAKE_CLI. The client_types property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
 	ClientTypes *string `json:"clientTypes,omitempty" tf:"client_types,omitempty"`
 
 	// (String) Specifies a comment for the authentication policy.
@@ -30,8 +30,11 @@ type DescribeOutputObservation struct {
 	// factor authentication (MFA) during login. Authentication methods not listed in this parameter do not prompt for multi-factor authentication. Allowed values are ALL | SAML | PASSWORD.
 	MfaAuthenticationMethods *string `json:"mfaAuthenticationMethods,omitempty" tf:"mfa_authentication_methods,omitempty"`
 
-	// factor authentication. Allowed values are REQUIRED and OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the CLIENT_TYPES parameter must include SNOWFLAKE_UI, because Snowsight is the only place users can enroll in multi-factor authentication (MFA).
+	// factor authentication. Valid values are (case-insensitive): REQUIRED | REQUIRED_PASSWORD_ONLY | OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the client_types parameter must include snowflake_ui, because Snowsight is the only place users can enroll in multi-factor authentication (MFA). Note that when you set this value to OPTIONAL, and your account setup forces users to enroll in MFA, then Snowflake may set quietly this value to REQUIRED_PASSWORD_ONLY, which may cause permadiff. In this case, you may want to adjust this field value.
 	MfaEnrollment *string `json:"mfaEnrollment,omitempty" tf:"mfa_enrollment,omitempty"`
+
+	// factor authentication (MFA) methods that users can use as a second factor of authentication. (see below for nested schema)
+	MfaPolicy *string `json:"mfaPolicy,omitempty" tf:"mfa_policy,omitempty"`
 
 	// (String) Specifies the identifier for the authentication policy. Due to technical limitations (read more here), avoid using the following characters: |, ., ".
 	Name *string `json:"name,omitempty" tf:"name,omitempty"`
@@ -39,22 +42,114 @@ type DescribeOutputObservation struct {
 	// (String)
 	Owner *string `json:"owner,omitempty" tf:"owner,omitempty"`
 
-	// (Set of String) A list of security integrations the authentication policy is associated with. This parameter has no effect when SAML or OAUTH are not in the AUTHENTICATION_METHODS list. All values in the SECURITY_INTEGRATIONS list must be compatible with the values in the AUTHENTICATION_METHODS list. For example, if SECURITY_INTEGRATIONS contains a SAML security integration, and AUTHENTICATION_METHODS contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
+	// (Block List, Max: 1) Specifies the policy for programmatic access tokens. (see below for nested schema)
+	PatPolicy *string `json:"patPolicy,omitempty" tf:"pat_policy,omitempty"`
+
+	// (Set of String) A list of security integrations the authentication policy is associated with. This parameter has no effect when saml or oauth are not in the authentication_methods list. All values in the security_integrations list must be compatible with the values in the authentication_methods list. For example, if security_integrations contains a SAML security integration, and authentication_methods contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
 	SecurityIntegrations *string `json:"securityIntegrations,omitempty" tf:"security_integrations,omitempty"`
+
+	// (Block List, Max: 1) Specifies the policy for workload identity federation. (see below for nested schema)
+	WorkloadIdentityPolicy *string `json:"workloadIdentityPolicy,omitempty" tf:"workload_identity_policy,omitempty"`
 }
 
 type DescribeOutputParameters struct {
 }
 
+type MfaPolicyInitParameters struct {
+
+	// Prefer using uppercased values.
+	// Specifies the allowed methods for the MFA policy. Valid values are: `ALL` | `PASSKEY` | `TOTP` | `DUO`. Prefer using uppercased values.
+	// +listType=set
+	AllowedMethods []*string `json:"allowedMethods,omitempty" tf:"allowed_methods,omitempty"`
+
+	// factor authentication (MFA) is enforced on external authentication. Valid values are (case-insensitive): ALL | NONE.
+	// Determines whether multi-factor authentication (MFA) is enforced on external authentication. Valid values are (case-insensitive): `ALL` | `NONE`.
+	EnforceMfaOnExternalAuthentication *string `json:"enforceMfaOnExternalAuthentication,omitempty" tf:"enforce_mfa_on_external_authentication,omitempty"`
+}
+
+type MfaPolicyObservation struct {
+
+	// Prefer using uppercased values.
+	// Specifies the allowed methods for the MFA policy. Valid values are: `ALL` | `PASSKEY` | `TOTP` | `DUO`. Prefer using uppercased values.
+	// +listType=set
+	AllowedMethods []*string `json:"allowedMethods,omitempty" tf:"allowed_methods,omitempty"`
+
+	// factor authentication (MFA) is enforced on external authentication. Valid values are (case-insensitive): ALL | NONE.
+	// Determines whether multi-factor authentication (MFA) is enforced on external authentication. Valid values are (case-insensitive): `ALL` | `NONE`.
+	EnforceMfaOnExternalAuthentication *string `json:"enforceMfaOnExternalAuthentication,omitempty" tf:"enforce_mfa_on_external_authentication,omitempty"`
+}
+
+type MfaPolicyParameters struct {
+
+	// Prefer using uppercased values.
+	// Specifies the allowed methods for the MFA policy. Valid values are: `ALL` | `PASSKEY` | `TOTP` | `DUO`. Prefer using uppercased values.
+	// +kubebuilder:validation:Optional
+	// +listType=set
+	AllowedMethods []*string `json:"allowedMethods,omitempty" tf:"allowed_methods,omitempty"`
+
+	// factor authentication (MFA) is enforced on external authentication. Valid values are (case-insensitive): ALL | NONE.
+	// Determines whether multi-factor authentication (MFA) is enforced on external authentication. Valid values are (case-insensitive): `ALL` | `NONE`.
+	// +kubebuilder:validation:Optional
+	EnforceMfaOnExternalAuthentication *string `json:"enforceMfaOnExternalAuthentication,omitempty" tf:"enforce_mfa_on_external_authentication,omitempty"`
+}
+
+type PatPolicyInitParameters struct {
+
+	// (Number) Specifies the default expiration time (in days) for a programmatic access token.
+	// Specifies the default expiration time (in days) for a programmatic access token.
+	DefaultExpiryInDays *float64 `json:"defaultExpiryInDays,omitempty" tf:"default_expiry_in_days,omitempty"`
+
+	// (Number) Specifies the maximum number of days that can be set for the expiration time for a programmatic access token.
+	// Specifies the maximum number of days that can be set for the expiration time for a programmatic access token.
+	MaxExpiryInDays *float64 `json:"maxExpiryInDays,omitempty" tf:"max_expiry_in_days,omitempty"`
+
+	// (String) Specifies the network policy evaluation for the PAT.
+	// Specifies the network policy evaluation for the PAT.
+	NetworkPolicyEvaluation *string `json:"networkPolicyEvaluation,omitempty" tf:"network_policy_evaluation,omitempty"`
+}
+
+type PatPolicyObservation struct {
+
+	// (Number) Specifies the default expiration time (in days) for a programmatic access token.
+	// Specifies the default expiration time (in days) for a programmatic access token.
+	DefaultExpiryInDays *float64 `json:"defaultExpiryInDays,omitempty" tf:"default_expiry_in_days,omitempty"`
+
+	// (Number) Specifies the maximum number of days that can be set for the expiration time for a programmatic access token.
+	// Specifies the maximum number of days that can be set for the expiration time for a programmatic access token.
+	MaxExpiryInDays *float64 `json:"maxExpiryInDays,omitempty" tf:"max_expiry_in_days,omitempty"`
+
+	// (String) Specifies the network policy evaluation for the PAT.
+	// Specifies the network policy evaluation for the PAT.
+	NetworkPolicyEvaluation *string `json:"networkPolicyEvaluation,omitempty" tf:"network_policy_evaluation,omitempty"`
+}
+
+type PatPolicyParameters struct {
+
+	// (Number) Specifies the default expiration time (in days) for a programmatic access token.
+	// Specifies the default expiration time (in days) for a programmatic access token.
+	// +kubebuilder:validation:Optional
+	DefaultExpiryInDays *float64 `json:"defaultExpiryInDays,omitempty" tf:"default_expiry_in_days,omitempty"`
+
+	// (Number) Specifies the maximum number of days that can be set for the expiration time for a programmatic access token.
+	// Specifies the maximum number of days that can be set for the expiration time for a programmatic access token.
+	// +kubebuilder:validation:Optional
+	MaxExpiryInDays *float64 `json:"maxExpiryInDays,omitempty" tf:"max_expiry_in_days,omitempty"`
+
+	// (String) Specifies the network policy evaluation for the PAT.
+	// Specifies the network policy evaluation for the PAT.
+	// +kubebuilder:validation:Optional
+	NetworkPolicyEvaluation *string `json:"networkPolicyEvaluation,omitempty" tf:"network_policy_evaluation,omitempty"`
+}
+
 type PolicyInitParameters struct {
 
-	// (Set of String) A list of authentication methods that are allowed during login. This parameter accepts one or more of the following values: ALL | SAML | PASSWORD | OAUTH | KEYPAIR
-	// A list of authentication methods that are allowed during login. This parameter accepts one or more of the following values: `ALL` | `SAML` | `PASSWORD` | `OAUTH` | `KEYPAIR`
+	// insensitive): ALL | SAML | PASSWORD | OAUTH | KEYPAIR | PROGRAMMATIC_ACCESS_TOKEN | WORKLOAD_IDENTITY.
+	// A list of authentication methods that are allowed during login. Valid values are (case-insensitive): `ALL` | `SAML` | `PASSWORD` | `OAUTH` | `KEYPAIR` | `PROGRAMMATIC_ACCESS_TOKEN` | `WORKLOAD_IDENTITY`.
 	// +listType=set
 	AuthenticationMethods []*string `json:"authenticationMethods,omitempty" tf:"authentication_methods,omitempty"`
 
-	// (Set of String) A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid CLIENT_TYPES, then the login attempt fails. Allowed values are ALL | SNOWFLAKE_UI | DRIVERS | SNOWSQL. The CLIENT_TYPES property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
-	// A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid CLIENT_TYPES, then the login attempt fails. Allowed values are `ALL` | `SNOWFLAKE_UI` | `DRIVERS` | `SNOWSQL`. The CLIENT_TYPES property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
+	// insensitive): ALL | SNOWFLAKE_UI | DRIVERS | SNOWSQL | SNOWFLAKE_CLI. The client_types property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
+	// A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid `client_types`, then the login attempt fails. Valid values are (case-insensitive): `ALL` | `SNOWFLAKE_UI` | `DRIVERS` | `SNOWSQL` | `SNOWFLAKE_CLI`. The `client_types` property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
 	// +listType=set
 	ClientTypes []*string `json:"clientTypes,omitempty" tf:"client_types,omitempty"`
 
@@ -71,33 +166,45 @@ type PolicyInitParameters struct {
 	// +listType=set
 	MfaAuthenticationMethods []*string `json:"mfaAuthenticationMethods,omitempty" tf:"mfa_authentication_methods,omitempty"`
 
-	// factor authentication. Allowed values are REQUIRED and OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the CLIENT_TYPES parameter must include SNOWFLAKE_UI, because Snowsight is the only place users can enroll in multi-factor authentication (MFA).
-	// (Default: `OPTIONAL`) Determines whether a user must enroll in multi-factor authentication. Allowed values are REQUIRED and OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the CLIENT_TYPES parameter must include SNOWFLAKE_UI, because Snowsight is the only place users can enroll in multi-factor authentication (MFA).
+	// factor authentication. Valid values are (case-insensitive): REQUIRED | REQUIRED_PASSWORD_ONLY | OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the client_types parameter must include snowflake_ui, because Snowsight is the only place users can enroll in multi-factor authentication (MFA). Note that when you set this value to OPTIONAL, and your account setup forces users to enroll in MFA, then Snowflake may set quietly this value to REQUIRED_PASSWORD_ONLY, which may cause permadiff. In this case, you may want to adjust this field value.
+	// Determines whether a user must enroll in multi-factor authentication. Valid values are (case-insensitive): `REQUIRED` | `REQUIRED_PASSWORD_ONLY` | `OPTIONAL`. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the `client_types` parameter must include `snowflake_ui`, because Snowsight is the only place users can enroll in multi-factor authentication (MFA). Note that when you set this value to OPTIONAL, and your account setup forces users to enroll in MFA, then Snowflake may set quietly this value to `REQUIRED_PASSWORD_ONLY`, which may cause permadiff. In this case, you may want to adjust this field value.
 	MfaEnrollment *string `json:"mfaEnrollment,omitempty" tf:"mfa_enrollment,omitempty"`
+
+	// factor authentication (MFA) methods that users can use as a second factor of authentication. (see below for nested schema)
+	// Specifies the multi-factor authentication (MFA) methods that users can use as a second factor of authentication.
+	MfaPolicy []MfaPolicyInitParameters `json:"mfaPolicy,omitempty" tf:"mfa_policy,omitempty"`
 
 	// (String) Specifies the identifier for the authentication policy. Due to technical limitations (read more here), avoid using the following characters: |, ., ".
 	// Specifies the identifier for the authentication policy. Due to technical limitations (read more [here](../guides/identifiers_rework_design_decisions#known-limitations-and-identifier-recommendations)), avoid using the following characters: `|`, `.`, `"`.
 	Name *string `json:"name,omitempty" tf:"name,omitempty"`
 
+	// (Block List, Max: 1) Specifies the policy for programmatic access tokens. (see below for nested schema)
+	// Specifies the policy for programmatic access tokens.
+	PatPolicy []PatPolicyInitParameters `json:"patPolicy,omitempty" tf:"pat_policy,omitempty"`
+
 	// (String) The schema in which to create the authentication policy. Due to technical limitations (read more here), avoid using the following characters: |, ., ".
 	// The schema in which to create the authentication policy. Due to technical limitations (read more [here](../guides/identifiers_rework_design_decisions#known-limitations-and-identifier-recommendations)), avoid using the following characters: `|`, `.`, `"`.
 	Schema *string `json:"schema,omitempty" tf:"schema,omitempty"`
 
-	// (Set of String) A list of security integrations the authentication policy is associated with. This parameter has no effect when SAML or OAUTH are not in the AUTHENTICATION_METHODS list. All values in the SECURITY_INTEGRATIONS list must be compatible with the values in the AUTHENTICATION_METHODS list. For example, if SECURITY_INTEGRATIONS contains a SAML security integration, and AUTHENTICATION_METHODS contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
-	// A list of security integrations the authentication policy is associated with. This parameter has no effect when SAML or OAUTH are not in the AUTHENTICATION_METHODS list. All values in the SECURITY_INTEGRATIONS list must be compatible with the values in the AUTHENTICATION_METHODS list. For example, if SECURITY_INTEGRATIONS contains a SAML security integration, and AUTHENTICATION_METHODS contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
+	// (Set of String) A list of security integrations the authentication policy is associated with. This parameter has no effect when saml or oauth are not in the authentication_methods list. All values in the security_integrations list must be compatible with the values in the authentication_methods list. For example, if security_integrations contains a SAML security integration, and authentication_methods contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
+	// A list of security integrations the authentication policy is associated with. This parameter has no effect when `saml` or `oauth` are not in the `authentication_methods` list. All values in the `security_integrations` list must be compatible with the values in the `authentication_methods` list. For example, if `security_integrations` contains a SAML security integration, and `authentication_methods` contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use `ALL` as parameter.
 	// +listType=set
 	SecurityIntegrations []*string `json:"securityIntegrations,omitempty" tf:"security_integrations,omitempty"`
+
+	// (Block List, Max: 1) Specifies the policy for workload identity federation. (see below for nested schema)
+	// Specifies the policy for workload identity federation.
+	WorkloadIdentityPolicy []WorkloadIdentityPolicyInitParameters `json:"workloadIdentityPolicy,omitempty" tf:"workload_identity_policy,omitempty"`
 }
 
 type PolicyObservation struct {
 
-	// (Set of String) A list of authentication methods that are allowed during login. This parameter accepts one or more of the following values: ALL | SAML | PASSWORD | OAUTH | KEYPAIR
-	// A list of authentication methods that are allowed during login. This parameter accepts one or more of the following values: `ALL` | `SAML` | `PASSWORD` | `OAUTH` | `KEYPAIR`
+	// insensitive): ALL | SAML | PASSWORD | OAUTH | KEYPAIR | PROGRAMMATIC_ACCESS_TOKEN | WORKLOAD_IDENTITY.
+	// A list of authentication methods that are allowed during login. Valid values are (case-insensitive): `ALL` | `SAML` | `PASSWORD` | `OAUTH` | `KEYPAIR` | `PROGRAMMATIC_ACCESS_TOKEN` | `WORKLOAD_IDENTITY`.
 	// +listType=set
 	AuthenticationMethods []*string `json:"authenticationMethods,omitempty" tf:"authentication_methods,omitempty"`
 
-	// (Set of String) A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid CLIENT_TYPES, then the login attempt fails. Allowed values are ALL | SNOWFLAKE_UI | DRIVERS | SNOWSQL. The CLIENT_TYPES property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
-	// A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid CLIENT_TYPES, then the login attempt fails. Allowed values are `ALL` | `SNOWFLAKE_UI` | `DRIVERS` | `SNOWSQL`. The CLIENT_TYPES property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
+	// insensitive): ALL | SNOWFLAKE_UI | DRIVERS | SNOWSQL | SNOWFLAKE_CLI. The client_types property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
+	// A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid `client_types`, then the login attempt fails. Valid values are (case-insensitive): `ALL` | `SNOWFLAKE_UI` | `DRIVERS` | `SNOWSQL` | `SNOWFLAKE_CLI`. The `client_types` property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
 	// +listType=set
 	ClientTypes []*string `json:"clientTypes,omitempty" tf:"client_types,omitempty"`
 
@@ -125,38 +232,50 @@ type PolicyObservation struct {
 	// +listType=set
 	MfaAuthenticationMethods []*string `json:"mfaAuthenticationMethods,omitempty" tf:"mfa_authentication_methods,omitempty"`
 
-	// factor authentication. Allowed values are REQUIRED and OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the CLIENT_TYPES parameter must include SNOWFLAKE_UI, because Snowsight is the only place users can enroll in multi-factor authentication (MFA).
-	// (Default: `OPTIONAL`) Determines whether a user must enroll in multi-factor authentication. Allowed values are REQUIRED and OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the CLIENT_TYPES parameter must include SNOWFLAKE_UI, because Snowsight is the only place users can enroll in multi-factor authentication (MFA).
+	// factor authentication. Valid values are (case-insensitive): REQUIRED | REQUIRED_PASSWORD_ONLY | OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the client_types parameter must include snowflake_ui, because Snowsight is the only place users can enroll in multi-factor authentication (MFA). Note that when you set this value to OPTIONAL, and your account setup forces users to enroll in MFA, then Snowflake may set quietly this value to REQUIRED_PASSWORD_ONLY, which may cause permadiff. In this case, you may want to adjust this field value.
+	// Determines whether a user must enroll in multi-factor authentication. Valid values are (case-insensitive): `REQUIRED` | `REQUIRED_PASSWORD_ONLY` | `OPTIONAL`. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the `client_types` parameter must include `snowflake_ui`, because Snowsight is the only place users can enroll in multi-factor authentication (MFA). Note that when you set this value to OPTIONAL, and your account setup forces users to enroll in MFA, then Snowflake may set quietly this value to `REQUIRED_PASSWORD_ONLY`, which may cause permadiff. In this case, you may want to adjust this field value.
 	MfaEnrollment *string `json:"mfaEnrollment,omitempty" tf:"mfa_enrollment,omitempty"`
+
+	// factor authentication (MFA) methods that users can use as a second factor of authentication. (see below for nested schema)
+	// Specifies the multi-factor authentication (MFA) methods that users can use as a second factor of authentication.
+	MfaPolicy []MfaPolicyObservation `json:"mfaPolicy,omitempty" tf:"mfa_policy,omitempty"`
 
 	// (String) Specifies the identifier for the authentication policy. Due to technical limitations (read more here), avoid using the following characters: |, ., ".
 	// Specifies the identifier for the authentication policy. Due to technical limitations (read more [here](../guides/identifiers_rework_design_decisions#known-limitations-and-identifier-recommendations)), avoid using the following characters: `|`, `.`, `"`.
 	Name *string `json:"name,omitempty" tf:"name,omitempty"`
 
+	// (Block List, Max: 1) Specifies the policy for programmatic access tokens. (see below for nested schema)
+	// Specifies the policy for programmatic access tokens.
+	PatPolicy []PatPolicyObservation `json:"patPolicy,omitempty" tf:"pat_policy,omitempty"`
+
 	// (String) The schema in which to create the authentication policy. Due to technical limitations (read more here), avoid using the following characters: |, ., ".
 	// The schema in which to create the authentication policy. Due to technical limitations (read more [here](../guides/identifiers_rework_design_decisions#known-limitations-and-identifier-recommendations)), avoid using the following characters: `|`, `.`, `"`.
 	Schema *string `json:"schema,omitempty" tf:"schema,omitempty"`
 
-	// (Set of String) A list of security integrations the authentication policy is associated with. This parameter has no effect when SAML or OAUTH are not in the AUTHENTICATION_METHODS list. All values in the SECURITY_INTEGRATIONS list must be compatible with the values in the AUTHENTICATION_METHODS list. For example, if SECURITY_INTEGRATIONS contains a SAML security integration, and AUTHENTICATION_METHODS contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
-	// A list of security integrations the authentication policy is associated with. This parameter has no effect when SAML or OAUTH are not in the AUTHENTICATION_METHODS list. All values in the SECURITY_INTEGRATIONS list must be compatible with the values in the AUTHENTICATION_METHODS list. For example, if SECURITY_INTEGRATIONS contains a SAML security integration, and AUTHENTICATION_METHODS contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
+	// (Set of String) A list of security integrations the authentication policy is associated with. This parameter has no effect when saml or oauth are not in the authentication_methods list. All values in the security_integrations list must be compatible with the values in the authentication_methods list. For example, if security_integrations contains a SAML security integration, and authentication_methods contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
+	// A list of security integrations the authentication policy is associated with. This parameter has no effect when `saml` or `oauth` are not in the `authentication_methods` list. All values in the `security_integrations` list must be compatible with the values in the `authentication_methods` list. For example, if `security_integrations` contains a SAML security integration, and `authentication_methods` contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use `ALL` as parameter.
 	// +listType=set
 	SecurityIntegrations []*string `json:"securityIntegrations,omitempty" tf:"security_integrations,omitempty"`
 
 	// (List of Object) Outputs the result of SHOW AUTHENTICATION POLICIES for the given policy. (see below for nested schema)
 	// Outputs the result of `SHOW AUTHENTICATION POLICIES` for the given policy.
 	ShowOutput []ShowOutputObservation `json:"showOutput,omitempty" tf:"show_output,omitempty"`
+
+	// (Block List, Max: 1) Specifies the policy for workload identity federation. (see below for nested schema)
+	// Specifies the policy for workload identity federation.
+	WorkloadIdentityPolicy []WorkloadIdentityPolicyObservation `json:"workloadIdentityPolicy,omitempty" tf:"workload_identity_policy,omitempty"`
 }
 
 type PolicyParameters struct {
 
-	// (Set of String) A list of authentication methods that are allowed during login. This parameter accepts one or more of the following values: ALL | SAML | PASSWORD | OAUTH | KEYPAIR
-	// A list of authentication methods that are allowed during login. This parameter accepts one or more of the following values: `ALL` | `SAML` | `PASSWORD` | `OAUTH` | `KEYPAIR`
+	// insensitive): ALL | SAML | PASSWORD | OAUTH | KEYPAIR | PROGRAMMATIC_ACCESS_TOKEN | WORKLOAD_IDENTITY.
+	// A list of authentication methods that are allowed during login. Valid values are (case-insensitive): `ALL` | `SAML` | `PASSWORD` | `OAUTH` | `KEYPAIR` | `PROGRAMMATIC_ACCESS_TOKEN` | `WORKLOAD_IDENTITY`.
 	// +kubebuilder:validation:Optional
 	// +listType=set
 	AuthenticationMethods []*string `json:"authenticationMethods,omitempty" tf:"authentication_methods,omitempty"`
 
-	// (Set of String) A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid CLIENT_TYPES, then the login attempt fails. Allowed values are ALL | SNOWFLAKE_UI | DRIVERS | SNOWSQL. The CLIENT_TYPES property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
-	// A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid CLIENT_TYPES, then the login attempt fails. Allowed values are `ALL` | `SNOWFLAKE_UI` | `DRIVERS` | `SNOWSQL`. The CLIENT_TYPES property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
+	// insensitive): ALL | SNOWFLAKE_UI | DRIVERS | SNOWSQL | SNOWFLAKE_CLI. The client_types property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
+	// A list of clients that can authenticate with Snowflake. If a client tries to connect, and the client is not one of the valid `client_types`, then the login attempt fails. Valid values are (case-insensitive): `ALL` | `SNOWFLAKE_UI` | `DRIVERS` | `SNOWSQL` | `SNOWFLAKE_CLI`. The `client_types` property of an authentication policy is a best effort method to block user logins based on specific clients. It should not be used as the sole control to establish a security boundary.
 	// +kubebuilder:validation:Optional
 	// +listType=set
 	ClientTypes []*string `json:"clientTypes,omitempty" tf:"client_types,omitempty"`
@@ -177,26 +296,41 @@ type PolicyParameters struct {
 	// +listType=set
 	MfaAuthenticationMethods []*string `json:"mfaAuthenticationMethods,omitempty" tf:"mfa_authentication_methods,omitempty"`
 
-	// factor authentication. Allowed values are REQUIRED and OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the CLIENT_TYPES parameter must include SNOWFLAKE_UI, because Snowsight is the only place users can enroll in multi-factor authentication (MFA).
-	// (Default: `OPTIONAL`) Determines whether a user must enroll in multi-factor authentication. Allowed values are REQUIRED and OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the CLIENT_TYPES parameter must include SNOWFLAKE_UI, because Snowsight is the only place users can enroll in multi-factor authentication (MFA).
+	// factor authentication. Valid values are (case-insensitive): REQUIRED | REQUIRED_PASSWORD_ONLY | OPTIONAL. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the client_types parameter must include snowflake_ui, because Snowsight is the only place users can enroll in multi-factor authentication (MFA). Note that when you set this value to OPTIONAL, and your account setup forces users to enroll in MFA, then Snowflake may set quietly this value to REQUIRED_PASSWORD_ONLY, which may cause permadiff. In this case, you may want to adjust this field value.
+	// Determines whether a user must enroll in multi-factor authentication. Valid values are (case-insensitive): `REQUIRED` | `REQUIRED_PASSWORD_ONLY` | `OPTIONAL`. When REQUIRED is specified, Enforces users to enroll in MFA. If this value is used, then the `client_types` parameter must include `snowflake_ui`, because Snowsight is the only place users can enroll in multi-factor authentication (MFA). Note that when you set this value to OPTIONAL, and your account setup forces users to enroll in MFA, then Snowflake may set quietly this value to `REQUIRED_PASSWORD_ONLY`, which may cause permadiff. In this case, you may want to adjust this field value.
 	// +kubebuilder:validation:Optional
 	MfaEnrollment *string `json:"mfaEnrollment,omitempty" tf:"mfa_enrollment,omitempty"`
+
+	// factor authentication (MFA) methods that users can use as a second factor of authentication. (see below for nested schema)
+	// Specifies the multi-factor authentication (MFA) methods that users can use as a second factor of authentication.
+	// +kubebuilder:validation:Optional
+	MfaPolicy []MfaPolicyParameters `json:"mfaPolicy,omitempty" tf:"mfa_policy,omitempty"`
 
 	// (String) Specifies the identifier for the authentication policy. Due to technical limitations (read more here), avoid using the following characters: |, ., ".
 	// Specifies the identifier for the authentication policy. Due to technical limitations (read more [here](../guides/identifiers_rework_design_decisions#known-limitations-and-identifier-recommendations)), avoid using the following characters: `|`, `.`, `"`.
 	// +kubebuilder:validation:Optional
 	Name *string `json:"name,omitempty" tf:"name,omitempty"`
 
+	// (Block List, Max: 1) Specifies the policy for programmatic access tokens. (see below for nested schema)
+	// Specifies the policy for programmatic access tokens.
+	// +kubebuilder:validation:Optional
+	PatPolicy []PatPolicyParameters `json:"patPolicy,omitempty" tf:"pat_policy,omitempty"`
+
 	// (String) The schema in which to create the authentication policy. Due to technical limitations (read more here), avoid using the following characters: |, ., ".
 	// The schema in which to create the authentication policy. Due to technical limitations (read more [here](../guides/identifiers_rework_design_decisions#known-limitations-and-identifier-recommendations)), avoid using the following characters: `|`, `.`, `"`.
 	// +kubebuilder:validation:Optional
 	Schema *string `json:"schema,omitempty" tf:"schema,omitempty"`
 
-	// (Set of String) A list of security integrations the authentication policy is associated with. This parameter has no effect when SAML or OAUTH are not in the AUTHENTICATION_METHODS list. All values in the SECURITY_INTEGRATIONS list must be compatible with the values in the AUTHENTICATION_METHODS list. For example, if SECURITY_INTEGRATIONS contains a SAML security integration, and AUTHENTICATION_METHODS contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
-	// A list of security integrations the authentication policy is associated with. This parameter has no effect when SAML or OAUTH are not in the AUTHENTICATION_METHODS list. All values in the SECURITY_INTEGRATIONS list must be compatible with the values in the AUTHENTICATION_METHODS list. For example, if SECURITY_INTEGRATIONS contains a SAML security integration, and AUTHENTICATION_METHODS contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
+	// (Set of String) A list of security integrations the authentication policy is associated with. This parameter has no effect when saml or oauth are not in the authentication_methods list. All values in the security_integrations list must be compatible with the values in the authentication_methods list. For example, if security_integrations contains a SAML security integration, and authentication_methods contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use ALL as parameter.
+	// A list of security integrations the authentication policy is associated with. This parameter has no effect when `saml` or `oauth` are not in the `authentication_methods` list. All values in the `security_integrations` list must be compatible with the values in the `authentication_methods` list. For example, if `security_integrations` contains a SAML security integration, and `authentication_methods` contains OAUTH, then you cannot create the authentication policy. To allow all security integrations use `ALL` as parameter.
 	// +kubebuilder:validation:Optional
 	// +listType=set
 	SecurityIntegrations []*string `json:"securityIntegrations,omitempty" tf:"security_integrations,omitempty"`
+
+	// (Block List, Max: 1) Specifies the policy for workload identity federation. (see below for nested schema)
+	// Specifies the policy for workload identity federation.
+	// +kubebuilder:validation:Optional
+	WorkloadIdentityPolicy []WorkloadIdentityPolicyParameters `json:"workloadIdentityPolicy,omitempty" tf:"workload_identity_policy,omitempty"`
 }
 
 type ShowOutputInitParameters struct {
@@ -212,6 +346,9 @@ type ShowOutputObservation struct {
 
 	// (String)
 	DatabaseName *string `json:"databaseName,omitempty" tf:"database_name,omitempty"`
+
+	// (String)
+	Kind *string `json:"kind,omitempty" tf:"kind,omitempty"`
 
 	// (String) Specifies the identifier for the authentication policy. Due to technical limitations (read more here), avoid using the following characters: |, ., ".
 	Name *string `json:"name,omitempty" tf:"name,omitempty"`
@@ -230,6 +367,79 @@ type ShowOutputObservation struct {
 }
 
 type ShowOutputParameters struct {
+}
+
+type WorkloadIdentityPolicyInitParameters struct {
+
+	// (Set of String) Specifies the list of AWS account IDs allowed by the authentication policy during workload identity authentication of type AWS.
+	// Specifies the list of AWS account IDs allowed by the authentication policy during workload identity authentication of type `AWS`.
+	// +listType=set
+	AllowedAwsAccounts []*string `json:"allowedAwsAccounts,omitempty" tf:"allowed_aws_accounts,omitempty"`
+
+	// (Set of String) Specifies the list of Azure Entra ID issuers allowed by the authentication policy during workload identity authentication of type AZURE.
+	// Specifies the list of Azure Entra ID issuers allowed by the authentication policy during workload identity authentication of type `AZURE`.
+	// +listType=set
+	AllowedAzureIssuers []*string `json:"allowedAzureIssuers,omitempty" tf:"allowed_azure_issuers,omitempty"`
+
+	// (Set of String) Specifies the list of OIDC issuers allowed by the authentication policy during workload identity authentication of type OIDC.
+	// Specifies the list of OIDC issuers allowed by the authentication policy during workload identity authentication of type `OIDC`.
+	// +listType=set
+	AllowedOidcIssuers []*string `json:"allowedOidcIssuers,omitempty" tf:"allowed_oidc_issuers,omitempty"`
+
+	// Prefer using uppercased values.
+	// Specifies the allowed providers for the workload identity policy. Valid values are: `ALL` | `AWS` | `AZURE` | `GCP` | `OIDC`. Prefer using uppercased values.
+	// +listType=set
+	AllowedProviders []*string `json:"allowedProviders,omitempty" tf:"allowed_providers,omitempty"`
+}
+
+type WorkloadIdentityPolicyObservation struct {
+
+	// (Set of String) Specifies the list of AWS account IDs allowed by the authentication policy during workload identity authentication of type AWS.
+	// Specifies the list of AWS account IDs allowed by the authentication policy during workload identity authentication of type `AWS`.
+	// +listType=set
+	AllowedAwsAccounts []*string `json:"allowedAwsAccounts,omitempty" tf:"allowed_aws_accounts,omitempty"`
+
+	// (Set of String) Specifies the list of Azure Entra ID issuers allowed by the authentication policy during workload identity authentication of type AZURE.
+	// Specifies the list of Azure Entra ID issuers allowed by the authentication policy during workload identity authentication of type `AZURE`.
+	// +listType=set
+	AllowedAzureIssuers []*string `json:"allowedAzureIssuers,omitempty" tf:"allowed_azure_issuers,omitempty"`
+
+	// (Set of String) Specifies the list of OIDC issuers allowed by the authentication policy during workload identity authentication of type OIDC.
+	// Specifies the list of OIDC issuers allowed by the authentication policy during workload identity authentication of type `OIDC`.
+	// +listType=set
+	AllowedOidcIssuers []*string `json:"allowedOidcIssuers,omitempty" tf:"allowed_oidc_issuers,omitempty"`
+
+	// Prefer using uppercased values.
+	// Specifies the allowed providers for the workload identity policy. Valid values are: `ALL` | `AWS` | `AZURE` | `GCP` | `OIDC`. Prefer using uppercased values.
+	// +listType=set
+	AllowedProviders []*string `json:"allowedProviders,omitempty" tf:"allowed_providers,omitempty"`
+}
+
+type WorkloadIdentityPolicyParameters struct {
+
+	// (Set of String) Specifies the list of AWS account IDs allowed by the authentication policy during workload identity authentication of type AWS.
+	// Specifies the list of AWS account IDs allowed by the authentication policy during workload identity authentication of type `AWS`.
+	// +kubebuilder:validation:Optional
+	// +listType=set
+	AllowedAwsAccounts []*string `json:"allowedAwsAccounts,omitempty" tf:"allowed_aws_accounts,omitempty"`
+
+	// (Set of String) Specifies the list of Azure Entra ID issuers allowed by the authentication policy during workload identity authentication of type AZURE.
+	// Specifies the list of Azure Entra ID issuers allowed by the authentication policy during workload identity authentication of type `AZURE`.
+	// +kubebuilder:validation:Optional
+	// +listType=set
+	AllowedAzureIssuers []*string `json:"allowedAzureIssuers,omitempty" tf:"allowed_azure_issuers,omitempty"`
+
+	// (Set of String) Specifies the list of OIDC issuers allowed by the authentication policy during workload identity authentication of type OIDC.
+	// Specifies the list of OIDC issuers allowed by the authentication policy during workload identity authentication of type `OIDC`.
+	// +kubebuilder:validation:Optional
+	// +listType=set
+	AllowedOidcIssuers []*string `json:"allowedOidcIssuers,omitempty" tf:"allowed_oidc_issuers,omitempty"`
+
+	// Prefer using uppercased values.
+	// Specifies the allowed providers for the workload identity policy. Valid values are: `ALL` | `AWS` | `AZURE` | `GCP` | `OIDC`. Prefer using uppercased values.
+	// +kubebuilder:validation:Optional
+	// +listType=set
+	AllowedProviders []*string `json:"allowedProviders,omitempty" tf:"allowed_providers,omitempty"`
 }
 
 // PolicySpec defines the desired state of Policy

@@ -3017,6 +3017,9 @@ spec:
                         hasRsaPublicKey:
                           description: (Boolean)
                           type: boolean
+                        hasWorkloadIdentity:
+                          description: (Boolean)
+                          type: boolean
                         lastName:
                           description: (String, Sensitive) Last name of the user.
                           type: string

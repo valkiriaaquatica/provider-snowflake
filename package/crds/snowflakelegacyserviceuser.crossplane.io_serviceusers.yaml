@@ -2874,6 +2874,9 @@ spec:
                         hasRsaPublicKey:
                           description: (Boolean)
                           type: boolean
+                        hasWorkloadIdentity:
+                          description: (Boolean)
+                          type: boolean
                         lastName:
                           description: (String)
                           type: string

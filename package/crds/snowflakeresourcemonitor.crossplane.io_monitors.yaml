@@ -112,8 +112,8 @@ spec:
                     x-kubernetes-list-type: set
                   startTimestamp:
                     description: |-
-                      (String) The date and time when the resource monitor starts monitoring credit usage for the assigned warehouses. If you set a start_timestamp for a resource monitor, you must also set frequency.  After removing this field from the config, the previously set value will be preserved on the Snowflake side, not the default value. That's due to Snowflake limitation and the lack of unset functionality for this parameter.
-                      The date and time when the resource monitor starts monitoring credit usage for the assigned warehouses. If you set a `start_timestamp` for a resource monitor, you must also set `frequency`.  After removing this field from the config, the previously set value will be preserved on the Snowflake side, not the default value. That's due to Snowflake limitation and the lack of unset functionality for this parameter.
+                      (String) The date and time when the resource monitor starts monitoring credit usage for the assigned warehouses. If you set a start_timestamp for a resource monitor, you must also set frequency. If you specify the special value IMMEDIATELY, the current date is used. After removing this field from the config, the previously set value will be preserved on the Snowflake side, not the default value. That's due to Snowflake limitation and the lack of unset functionality for this parameter.
+                      The date and time when the resource monitor starts monitoring credit usage for the assigned warehouses. If you set a `start_timestamp` for a resource monitor, you must also set `frequency`. If you specify the special value `IMMEDIATELY`, the current date is used. After removing this field from the config, the previously set value will be preserved on the Snowflake side, not the default value. That's due to Snowflake limitation and the lack of unset functionality for this parameter.
                     type: string
                   suspendImmediateTrigger:
                     description: |-
@@ -177,8 +177,8 @@ spec:
                     x-kubernetes-list-type: set
                   startTimestamp:
                     description: |-
-                      (String) The date and time when the resource monitor starts monitoring credit usage for the assigned warehouses. If you set a start_timestamp for a resource monitor, you must also set frequency.  After removing this field from the config, the previously set value will be preserved on the Snowflake side, not the default value. That's due to Snowflake limitation and the lack of unset functionality for this parameter.
-                      The date and time when the resource monitor starts monitoring credit usage for the assigned warehouses. If you set a `start_timestamp` for a resource monitor, you must also set `frequency`.  After removing this field from the config, the previously set value will be preserved on the Snowflake side, not the default value. That's due to Snowflake limitation and the lack of unset functionality for this parameter.
+                      (String) The date and time when the resource monitor starts monitoring credit usage for the assigned warehouses. If you set a start_timestamp for a resource monitor, you must also set frequency. If you specify the special value IMMEDIATELY, the current date is used. After removing this field from the config, the previously set value will be preserved on the Snowflake side, not the default value. That's due to Snowflake limitation and the lack of unset functionality for this parameter.
+                      The date and time when the resource monitor starts monitoring credit usage for the assigned warehouses. If you set a `start_timestamp` for a resource monitor, you must also set `frequency`. If you specify the special value `IMMEDIATELY`, the current date is used. After removing this field from the config, the previously set value will be preserved on the Snowflake side, not the default value. That's due to Snowflake limitation and the lack of unset functionality for this parameter.
                     type: string
                   suspendImmediateTrigger:
                     description: |-
@@ -476,8 +476,8 @@ spec:
                     type: array
                   startTimestamp:
                     description: |-
-                      (String) The date and time when the resource monitor starts monitoring credit usage for the assigned warehouses. If you set a start_timestamp for a resource monitor, you must also set frequency.  After removing this field from the config, the previously set value will be preserved on the Snowflake side, not the default value. That's due to Snowflake limitation and the lack of unset functionality for this parameter.
-                      The date and time when the resource monitor starts monitoring credit usage for the assigned warehouses. If you set a `start_timestamp` for a resource monitor, you must also set `frequency`.  After removing this field from the config, the previously set value will be preserved on the Snowflake side, not the default value. That's due to Snowflake limitation and the lack of unset functionality for this parameter.
+                      (String) The date and time when the resource monitor starts monitoring credit usage for the assigned warehouses. If you set a start_timestamp for a resource monitor, you must also set frequency. If you specify the special value IMMEDIATELY, the current date is used. After removing this field from the config, the previously set value will be preserved on the Snowflake side, not the default value. That's due to Snowflake limitation and the lack of unset functionality for this parameter.
+                      The date and time when the resource monitor starts monitoring credit usage for the assigned warehouses. If you set a `start_timestamp` for a resource monitor, you must also set `frequency`. If you specify the special value `IMMEDIATELY`, the current date is used. After removing this field from the config, the previously set value will be preserved on the Snowflake side, not the default value. That's due to Snowflake limitation and the lack of unset functionality for this parameter.
                     type: string
                   suspendImmediateTrigger:
                     description: |-
