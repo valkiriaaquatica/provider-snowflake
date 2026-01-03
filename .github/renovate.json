@@ -5,6 +5,9 @@
     ":semanticCommitTypeAll(chore)"
   ],
   "commitMessageAction": "update",
+  "platformAutomerge": true,
+  "automergeType": "pr",
+  "automergeStrategy": "squash",
 
   "customManagers": [
     {
@@ -46,6 +49,11 @@
     {
       "matchUpdateTypes": ["major"],
       "commitMessagePrefix": "{{semanticCommitType}}({{semanticCommitScope}}):"
+    },
+    {
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": true
     }
   ]
 }
